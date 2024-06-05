@@ -56,6 +56,6 @@ Proposed solution: Transform the app into a singular .exe file keeping the funct
 
 Feel free to open issues and send pull requests.
 
-## Licença
+## License
 
 This project is licensed under a GPL license. Feel free to copy, redistribute, modify or otherwise do whatever you want with this software.
