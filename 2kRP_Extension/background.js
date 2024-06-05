@@ -5,10 +5,8 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ data: message.data }),
+            body: JSON.stringify({ location: message.location, badgeImageUrl: message.badgeImageUrl, playersOnline: message.playersOnline, playersOnMap: message.playersOnMap }),
         })
-            .then(response => response.json())
-            .then(data => console.log('Success:', data))
             .catch(error => console.error('Error:', error));
     }
 });

@@ -6,8 +6,11 @@ bp = Blueprint('main', __name__)
 @bp.route('/receive_from_2kki', methods=['POST'])
 def receive_data():
     data = request.json
-    location = data['data']['location']
-    update_data(location)
+    location = data['location']
+    badgeImageUrl = data['badgeImageUrl']
+    playersOnline = data['playersOnline']
+    playersOnMap = data['playersOnMap']
+    update_data(location, badgeImageUrl, playersOnline, playersOnMap)
     return {"status": "success"}
 
 @bp.route('/status', methods=['GET'])
