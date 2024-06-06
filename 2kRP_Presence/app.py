@@ -1,4 +1,3 @@
-# app.py
 import logging
 import threading
 import signal

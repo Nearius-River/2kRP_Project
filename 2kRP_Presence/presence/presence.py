@@ -1,4 +1,3 @@
-# app.py
 import time
 import os
 from pypresence import Presence
