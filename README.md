@@ -47,12 +47,20 @@ It utilizes a browser extension to act as a "linker", sending necessary data to 
 
 - To start the server connection, open app.py and DO NOT close it (doing so will instantly terminate the server connection)
 - If you see "Connection established!" in the terminal, you can go to Yume 2kki site and start playing. Your presence will be updated as long as the app is running.
-- `preferences.json`: You can configure most of the presence text here. Simply open with any text editor (notepad, notepad++, etc) and change to what you want. Note: some patterns are also usable, such as $location or $playersonline (but only in specific fields. I will change this later).
+- `preferences.json`: You can configure most of the presence text here. Simply open with any text editor (notepad, notepad++, etc) and change to what you want. Note: some patterns are also usable, such as $location or $playersonline. A complete description of the available patterns:
+
+    `$location`: Where you are currently located in the game, e.g.: Urotsuki's Room, The Nexus, etc. Sets to "Unknown Location" if no location is available or is unknown.
+
+    `$playersonline`: The count of all players currently playing the game.
+
+    `$playersonmap`: The count of all players in the current map (the map you're in).
+
+You can use these patterns anywhere you want and in any way you like.
 
 ## Known problems
 
 1. The program uses a simple terminal interface to communicate with the user, giving only the option of minimizing or closing the window.
-Proposed solution: Implement a complete graphical interface
+Proposed solution: Implement a complete graphical interface, with a tab to set user preferences and configure the app.
 
 2. The installation may be too hard for lesser technological people and requires too many steps/configurations to be made
 Proposed solution: Transform the app into a singular .exe file keeping the functionality OR implement better ways to install the app automatically.
