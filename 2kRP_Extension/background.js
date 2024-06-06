@@ -1,4 +1,11 @@
-import { checkServerStatus } from './utils.js';
+function checkServerStatus(url) {
+    return fetch(url)
+        .then(response => response.ok)
+        .catch(error => {
+            console.error('Error checking server status:', error);
+            return false;
+        });
+}
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     if (message.type === '2KKI_DATA') {
