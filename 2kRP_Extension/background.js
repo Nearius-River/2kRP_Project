@@ -9,10 +9,10 @@ function checkServerStatus(url) {
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     if (message.type === '2KKI_DATA') {
-        checkServerStatus('http://localhost:3000/status')
+        checkServerStatus('http://localhost:7789/status')
             .then(isServerActive => {
                 if (isServerActive) {
-                    return fetch('http://localhost:3000/receive_from_2kki', {
+                    return fetch('http://localhost:7789/receive_from_2kki', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',

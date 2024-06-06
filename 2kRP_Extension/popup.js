@@ -17,7 +17,7 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     // Check server status
-    checkServerStatus('http://localhost:3000/status').then(isServerActive => {
+    checkServerStatus('http://localhost:7789/status').then(isServerActive => {
         if (isServerActive) {
             serverStatus.textContent = 'Server is up and running!';
             serverStatus.style.color = 'green';
