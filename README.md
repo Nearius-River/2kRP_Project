@@ -3,6 +3,10 @@
 This project intends to add Discord Rich Presence compatibility for Yume 2kki on the navigator (not the desktop application).
 It utilizes a browser extension to act as a "linker", sending necessary data to a receiver app in the desktop through a localhost connection. The presence is then updated for the connected client using pypresence.
 
+<div align="center">
+    <img src="https://github.com/Nearius-River/2kRP_Project/assets/49107257/d3bdd888-5fb3-43d9-9bba-56c5f0c266f7" alt="Example of how presence looks">
+</div>
+
 ## Project Structure
 
 - `2kRP_Extension/`: Contains the browser extension files.
@@ -43,6 +47,7 @@ It utilizes a browser extension to act as a "linker", sending necessary data to 
 
 - To start the server connection, open app.py and DO NOT close it (doing so will instantly terminate the server connection)
 - If you see "Connection established!" in the terminal, you can go to Yume 2kki site and start playing. Your presence will be updated as long as the app is running.
+- `preferences.json`: You can configure most of the presence text here. Simply open with any text editor (notepad, notepad++, etc) and change to what you want. Note: some patterns are also usable, such as $location or $playersonline (but only in specific fields. I will change this later).
 
 ## Known problems
 
