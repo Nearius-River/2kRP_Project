@@ -1,18 +1,31 @@
-from flask import Blueprint, request
+from flask import Blueprint, request, jsonify
 from shared.data import update_data
 
 bp = Blueprint('main', __name__)
 
 @bp.route('/receive_from_2kki', methods=['POST'])
 def receive_data():
-    data = request.json
-    location = data['location']
-    badgeImageUrl = data['badgeImageUrl']
-    playersOnline = data['playersOnline']
-    playersOnMap = data['playersOnMap']
-    update_data(location, badgeImageUrl, playersOnline, playersOnMap)
-    return {"status": "success"}
+    """
+    Receive data from linker extension and update the data store appropriately.
+    """
+    try:
+        data = request.json
+        if not data:
+            return jsonify({"status": "error", "message": "No data provided"}), 400
+
+        location = data.get('location')
+        badgeImageUrl = data.get('badgeImageUrl')
+        playersOnline = data.get('playersOnline')
+        playersOnMap = data.get('playersOnMap')
+
+        update_data(location, badgeImageUrl, playersOnline, playersOnMap)
+        return jsonify({"status": "success"})
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)}), 500
 
 @bp.route('/status', methods=['GET'])
 def status_check():
+    """
+    Verify server status.
+    """
     return "Server is running", 200
