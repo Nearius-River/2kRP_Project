@@ -1,3 +1,5 @@
+import { checkServerStatus } from './utils.js';
+
 document.addEventListener('DOMContentLoaded', function () {
     const toggleSwitch = document.getElementById('toggle-switch');
     const serverStatus = document.getElementById('server-status');
@@ -8,18 +10,15 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     // Check server status
-    fetch('http://localhost:3000/status')
-        .then(response => {
-            if (response.ok) {
+    checkServerStatus('http://localhost:3000/status')
+        .then(isServerActive => {
+            if (isServerActive) {
                 serverStatus.textContent = 'Server is up and running!';
                 serverStatus.style.color = 'green';
             } else {
-                throw new Error('Server is inactive');
+                serverStatus.textContent = 'Server is inactive! Be sure the receiver app is running.';
+                serverStatus.style.color = 'red';
             }
-        })
-        .catch(error => {
-            serverStatus.textContent = 'Server is inactive! Be sure the receiver app is running.';
-            serverStatus.style.color = 'red';
         });
 
     toggleSwitch.addEventListener('change', function () {

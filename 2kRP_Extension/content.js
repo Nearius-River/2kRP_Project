@@ -1,13 +1,8 @@
 let intervalId = null;
 
 function extractCount(inputString) {
-    var match = inputString.match(/\d+/);
-    
-    if (match) {
-        return match[0];
-    } else {
-        return null;
-    }
+    const match = inputString.match(/\d+/);
+    return match ? match[0] : null;
 }
 
 function getLocation() {
@@ -15,66 +10,45 @@ function getLocation() {
     if (spanElement) {
         const linkElement = spanElement.querySelector('a');
         if (linkElement) {
-            const location = linkElement.innerText;
-            return location;
+            return linkElement.innerText;
         }
     }
-
     return null;
 }
 
-function getPlayersOnline() {
-    const totalPlayersOnlineElement = document.getElementById('playerCountLabel');
-    var totalPlayersOnline;
-
-    try {
-        totalPlayersOnline = extractCount(totalPlayersOnlineElement.innerText);
-    } catch {
-        totalPlayersOnline = '0'
+function getPlayerCount(elementId) {
+    const element = document.getElementById(elementId);
+    if (element) {
+        return extractCount(element.innerText) || '0';
     }
-
-    return totalPlayersOnline
-}
-
-function getMapPlayers() {
-    const playersOnMapElement = document.getElementById('mapPlayerCountLabel');
-    var playersOnMap;
-
-    try {
-        playersOnMap = extractCount(playersOnMapElement.innerText);
-    } catch{
-        playersOnMap = '0';
-    }
-
-    return playersOnMap
+    return '0';
 }
 
 function getBackgroundImageUrl(element) {
     const style = window.getComputedStyle(element);
     const backgroundImage = style.backgroundImage;
-
     const urlMatch = backgroundImage.match(/url\(["']?([^"']*)["']?\)/);
     return urlMatch ? urlMatch[1] : null;
 }
 
 function sendAllData() {
     const location = getLocation();
-    const playersOnline = getPlayersOnline()
-    const playersOnMap = getMapPlayers()
-
-    // Badge image
-    var badgeImageUrl = null;
+    const playersOnline = getPlayerCount('playerCountLabel');
+    const playersOnMap = getPlayerCount('mapPlayerCountLabel');
+    let badgeImageUrl = null;
     const badgeElement = document.querySelector('#badgeButton .badge');
 
     if (badgeElement) {
-        imageUrl = getBackgroundImageUrl(badgeElement);
-
-        if (imageUrl) {
-            badgeImageUrl = imageUrl;
-        }
+        badgeImageUrl = getBackgroundImageUrl(badgeElement);
     }
 
-    chrome.runtime.sendMessage({ type: '2KKI_DATA', location: location, badgeImageUrl: badgeImageUrl, playersOnline: playersOnline, playersOnMap: playersOnMap });
+    chrome.runtime.sendMessage({ 
+        type: '2KKI_DATA', 
+        location, 
+        badgeImageUrl, 
+        playersOnline, 
+        playersOnMap 
+    });
 }
 
 function startCollecting() {
@@ -90,7 +64,6 @@ function stopCollecting() {
     }
 }
 
-// Listen for messages from popup.js
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     if (message.type === 'TOGGLE_EXTENSION') {
         if (message.enabled) {
@@ -101,7 +74,6 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     }
 });
 
-// Initialize the extension based on the stored state
 chrome.storage.sync.get('extensionEnabled', function (data) {
     if (data.extensionEnabled !== false) {
         startCollecting();
