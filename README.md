@@ -1,22 +1,24 @@
 # 2kRP Project
 
-This project intends to add Discord Rich Presence compatibility for Yume 2kki on the navigator (not the desktop application).
-It utilizes a browser extension to act as a "linker", sending necessary data to a receiver app in the desktop through a localhost connection. The presence is then updated for the connected client using pypresence.
+This project intends to add Discord Rich Presence compatibility for Yume 2kki in the navigator, while (hopefully, soon) being easy to use and customize.
+
+It utilizes a browser extension to act as a 
+"linker", whose primary function is to send site data (location, player count, etc) to the running Python app in the user's system through a localhost connection.
 
 <div align="center">
-    <img src="https://github.com/Nearius-River/2kRP_Project/assets/49107257/d3bdd888-5fb3-43d9-9bba-56c5f0c266f7" alt="Example of how presence looks">
+    <img src="https://github.com/Nearius-River/2kRP_Project/assets/49107257/d3bdd888-5fb3-43d9-9bba-56c5f0c266f7" alt="Example of how presence looks.">
 </div>
 
 ## Project Structure
 
 - `2kRP_Extension/`: Contains the browser extension files.
-- `2kRP_Presence/`: Contains the rich presence application. Also responsible for the local server.
+- `2kRP_Presence/`: Contains the rich presence application. Also responsible for establishing the local server.
 
 ## Installation
 
 ### Requisites
 
-- Python 3.x
+- Python 3.x (with pip available)
 - Discord (desktop app) installed for updating the Rich Presence (you must be logged in).
 
 ### Instructions
