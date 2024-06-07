@@ -2,6 +2,7 @@ import logging
 import threading
 import signal
 import sys
+from interface.gui import Application
 from presence.presence import run_presence
 from server.server import create_app
 from werkzeug.serving import make_server
@@ -53,6 +54,21 @@ if __name__ == '__main__':
     # Run the Flask app in a separate thread
     flask_thread = FlaskThread()
     flask_thread.start()
-    
-    # Run the presence update loop in the main thread
-    run_presence(stop_flag)
+
+    # Run the presence update loop in a separate thread
+    presence_thread = threading.Thread(target=run_presence, args=(stop_flag,))
+    presence_thread.start()
+
+    # Create the GUI in a separate thread
+    gui_thread = threading.Thread(target=lambda: Application().mainloop())
+    gui_thread.start()
+
+    # Wait for the GUI thread to finish
+    gui_thread.join()
+
+    # Signal the other threads to stop
+    stop_flag.set()
+
+    # Wait for the other threads to finish
+    flask_thread.join()
+    presence_thread.join()
