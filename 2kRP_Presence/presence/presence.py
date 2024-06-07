@@ -107,3 +107,5 @@ def run_presence(stop_flag):
             time.sleep(15)
     
     print('Presence ended.')
+    presence.clear()
+    presence.close()
