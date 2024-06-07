@@ -1,143 +1,123 @@
+import json
+import sys
 import tkinter as tk
 from tkinter import ttk
 from tkinter import messagebox
-import os
-import json
 import pystray
 from PIL import Image
+from utils.constants import get_app_name, get_app_version
 
 class Application(tk.Tk):
-    def __init__(self):
+    """Main tkinter interface."""
+    def __init__(self, stop_flag):
         super().__init__()
-        self.title("2kRP")
-        self.geometry("400x300")
-        self.configure(bg='#d3d3d3')
+        
+        # Constant variables and interface settings
+        self.title(get_app_name())
+        self.version = get_app_version()
+        self.default_bg = '#C2C6D0'
+        self.geometry('400x350')
+        self.stop_flag = stop_flag
+        
+        self.notebook = ttk.Notebook(self, style='Custom.TNotebook')
+        self.notebook.pack(fill='both', expand=True)
+
+        self.style = ttk.Style()
+        self.style.configure('Custom.TNotebook', background=self.default_bg)
+
+        # Tab definition
+        self.home_tab = ttk.Frame(self.notebook, style='Custom.TFrame')
+        self.settings_tab = ttk.Frame(self.notebook, style='Custom.TFrame')
+
+        self.notebook.add(self.home_tab, text='Home')
+        self.notebook.add(self.settings_tab, text='Settings')
+
+        self.create_home_tab()
+        self.create_settings_tab()
+
+        # Preferences from preferences.json
+        self.preferences = self.load_preferences()
+        self.update_settings_tab()
         
         # Set window icon
-        base_path = os.path.dirname(__file__)
-        icon_path = os.path.join(base_path, 'madotsuki.ico')
+        icon_path = 'images/madotsuki.ico'
         self.iconbitmap(icon_path)
-
-        # Load preferences from file
-        self.preferences = self.load_preferences()
-
-        # Create widgets
-        self.create_widgets()
-
-        # Create system tray icon
-        image = Image.open(icon_path)
+        
+        # Create system tray
         menu = pystray.Menu(
-            pystray.MenuItem('Show', self.show_window),
-            pystray.MenuItem('Exit', self.exit_window)
+            pystray.MenuItem('Show', self.restore_window),
+            pystray.MenuItem('Exit', self.terminate)
         )
-        self.tray_icon = pystray.Icon('2kRP', image, '2kRP', menu)
-        self.tray_icon.run_detached()
+        image = Image.open(icon_path)
+        self.tray = pystray.Icon(get_app_name(), image, get_app_name(), menu)
+        self.tray.run_detached()
+
+    def create_home_tab(self):
+        title_label = tk.Label(self.home_tab, text=f'Yume 2kki Rich Presence ({get_app_name()})', font=('Arial', 18), bg=self.default_bg)
+        title_label.pack(pady=20)
+
+        version_label = tk.Label(self.home_tab, text=f'App version: {self.version}', font=('Arial', 12), bg=self.default_bg)
+        version_label.pack(side='bottom', pady=20)
+
+        minimize_button = tk.Button(self.home_tab, text='Minimize to Tray', command=self.minimize_to_tray, bg=self.default_bg, fg='black')
+        minimize_button.pack(side='bottom', pady=20)
+
+    def create_settings_tab(self):
+        title_label = tk.Label(self.settings_tab, text='Settings', font=('Arial', 18), bg=self.default_bg)
+        title_label.grid(row=0, column=0, columnspan=2, pady=10)
+
+        self.settings_entries = {}
+
+        for i, setting in enumerate(['real_world_text', 'dream_world_text', 'location_text', 'minigame_text', 'large_image_text', 'small_image_text']):
+            label = tk.Label(self.settings_tab, text=setting, font=('Arial', 12), bg=self.default_bg)
+            label.grid(row=i+1, column=0, padx=10, pady=5)
+
+            entry = tk.Entry(self.settings_tab, width=30, bg='#F1E5D1', fg='black')
+            entry.grid(row=i+1, column=1, padx=10, pady=5)
+
+            self.settings_entries[setting] = entry
+
+        save_button = tk.Button(self.settings_tab, text='Save', command=self.save_preferences, bg=self.default_bg, fg='black')
+        save_button.grid(row=len(self.settings_entries)+1, column=0, columnspan=2, pady=10)
 
     def load_preferences(self):
-        """Loads preferences from preferences.json or creates a new file with defaults."""
+        """Loads preference values from the preferences file."""
         try:
-            with open("preferences.json", "r") as f:
+            with open('preferences.json', 'r') as f:
                 return json.load(f)
         except FileNotFoundError:
-            return {
-                "real_world_text": "Real World",
-                "dream_world_text": "Dream World",
-                "location_text": "In: $location",
-                "minigame_text": "Playing a minigame",
-                "large_image_text": "$playersonline Players Online - $playersonmap on Current Map",
-                "small_image_text": "2kRP v1.1"
-            }
+            return {}
 
-    def create_widgets(self):
-        # Main container
-        container = ttk.Notebook(self)
-        container.pack(expand=True, fill='both')
+    def update_settings_tab(self):
+        """Preloads the entries in settings tab with the preferences value."""
+        for setting, entry in self.settings_entries.items():
+            entry.delete(0, 'end')
+            entry.insert(0, self.preferences.get(setting, ''))
 
-        # Start screen
-        start_frame = ttk.Frame(container)
-        container.add(start_frame, text="Home")
-        
-        # App name
-        app_name_label = ttk.Label(start_frame, text="Yume 2kki Rich Presence (2kRP)", font=("Helvetica", 16))
-        app_name_label.pack(pady=10)
-
-        # App version
-        version_label = ttk.Label(start_frame, text="Version 1.1", font=("Helvetica", 12))
-        version_label.pack(pady=10)
-
-        # Server control
-        server_control_frame = ttk.Frame(start_frame)
-        server_control_frame.pack(pady=20)
-
-        server_status_label = ttk.Label(server_control_frame, text="Improvements coming to this soon (I swear!)", font=("Helvetica", 12))
-        server_status_label.pack(side="left", padx=10)
-
-        # Minimize to tray button
-        minimize_button = ttk.Button(server_control_frame, text="Minimize to Tray", command=self.minimize_to_tray)
-        minimize_button.pack(side="left", padx=10)
-
-        # Configuration screen
-        settings_frame = ttk.Frame(container)
-        container.add(settings_frame, text="Configurations")
-
-        # Configuration options
-        config_label = ttk.Label(settings_frame, text="Configurations", font=("Helvetica", 16))
-        config_label.pack(pady=10)
-
-        # Frame to hold the options
-        options_frame = ttk.Frame(settings_frame)
-        options_frame.pack(pady=10)
-
-        # Create text boxes with labels
-        self.entry_widgets = []
-        for i, (key, value) in enumerate(self.preferences.items()):
-            frame = ttk.Frame(options_frame)
-            frame.pack(fill='x')
-
-            label = ttk.Label(frame, text=f"{key}:", font=("Helvetica", 12))
-            label.pack(side="left", padx=5)
-
-            entry = ttk.Entry(frame)
-            entry.insert(0, value)
-            entry.pack(side="left", padx=5, expand=True, fill='x')
-
-            self.entry_widgets.append((label, entry, key))
-
-        # Save button
-        save_button = ttk.Button(settings_frame, text="Save", command=self.save_settings)
-        save_button.pack(pady=20)
-
-    def toggle_server(self):
-        messagebox.showinfo("Server", "Example.")
-
-    def save_settings(self):
-        """Validates and saves settings to preferences.json."""
-        new_preferences = {}
-        for _, entry, key in self.entry_widgets:
-            value = entry.get()
-            new_preferences[key] = value
-
+    def save_preferences(self):
+        """Saves entries from settings tab into the preferences file."""
+        for setting, entry in self.settings_entries.items():
+            self.preferences[setting] = entry.get()
         try:
-            with open("preferences.json", "w") as f:
-                json.dump(new_preferences, f, indent=4)
-            messagebox.showinfo("Configurations", "Preferences saved successfully!")
+            with open('preferences.json', 'w') as f:
+                json.dump(self.preferences, f, indent=4)
+            messagebox.showinfo('Preferences', 'Preferences have been saved!')
         except Exception as e:
-            messagebox.showerror("Error", f"Failed to save preferences: {e}")
-    
-    def on_tray_icon_clicked(self, icon, item):
-        if item.text == 'Show':
-            self.show_window()
-        elif item.text == 'Exit':
-            self.exit_window()
+            messagebox.showinfo('Error', f'Could not save preferences: {e}')
 
     def minimize_to_tray(self):
         self.withdraw()
-        self.tray_icon.visible = True
 
-    def show_window(self):
+    def restore_window(self):
         self.deiconify()
-        self.tray_icon.visible = False
 
-    def exit_window(self):
+    def terminate(self):
+        """Terminates the tkinter interface and sets stop_flag for other threads to end."""
+        self.stop_flag.set()
+        self.tray.stop()
         self.destroy()
-        self.tray_icon.stop()
+        
+    def start_app(self):
+        """Starts the tkinter mainloop() and sets stop_flag upon window closing."""
+        self.mainloop()
+        self.stop_flag.set()
