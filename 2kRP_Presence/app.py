@@ -25,7 +25,7 @@ class FlaskThread(threading.Thread):
 
     def run(self):
         """Run the Flask server."""
-        print_green('Flask server established, all OK!')
+        print_green('Flask server established!')
         self.server.serve_forever()
 
     def shutdown(self):
