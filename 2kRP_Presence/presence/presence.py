@@ -90,7 +90,7 @@ def run_presence(stop_flag):
     presence = Presence(CLIENT_ID)
     try:
         presence.connect()
-        print_green('Connection with client established!')
+        print_green('Connection with Discord client established!')
     except Exception as e:
         print_yellow('WARNING: The application returned an exception trying to connect. This is probably due to Discord not being properly detected.')
         print(f'The following exception has been raised: {e}')
@@ -105,3 +105,5 @@ def run_presence(stop_flag):
         except Exception as e:
             print_yellow(f'An error occurred during presence update: {e}')
             time.sleep(15)
+    
+    print('Presence ended.')

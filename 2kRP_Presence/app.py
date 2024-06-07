@@ -3,6 +3,7 @@ import threading
 import signal
 import sys
 from interface.gui import Application
+from color.colors import print_green
 from presence.presence import run_presence
 from server.server import create_app
 from werkzeug.serving import make_server
@@ -24,10 +25,12 @@ class FlaskThread(threading.Thread):
 
     def run(self):
         """Run the Flask server."""
+        print_green('Flask server established, all OK!')
         self.server.serve_forever()
 
     def shutdown(self):
         """Shutdown the Flask server."""
+        print('Flask server has ended.')
         self.server.shutdown()
 
 def signal_handler(sig, frame):
@@ -36,6 +39,8 @@ def signal_handler(sig, frame):
     stop_flag.set()
     flask_thread.shutdown()
     flask_thread.join()
+    gui_thread.join()
+    presence_thread.join()
     sys.exit(0)
 
 def greet_user():
@@ -60,15 +65,15 @@ if __name__ == '__main__':
     presence_thread.start()
 
     # Create the GUI in a separate thread
-    gui_thread = threading.Thread(target=lambda: Application().mainloop())
+    gui_thread = threading.Thread(target=lambda: Application(stop_flag).start_app())
     gui_thread.start()
-
+    
     # Wait for the GUI thread to finish
     gui_thread.join()
+    print('The app will close automatically in a few seconds...')
 
-    # Signal the other threads to stop
-    stop_flag.set()
-
-    # Wait for the other threads to finish
+    # Wait for all other threads to finish
+    flask_thread.shutdown()
     flask_thread.join()
     presence_thread.join()
+    sys.exit(0)
