@@ -1,5 +1,7 @@
 # 2kRP Project
 
+https://ynoproject.net/2kki/
+
 This project intends to add Discord Rich Presence compatibility for Yume 2kki in the navigator, while (hopefully, soon) being easy to use and customize.
 
 It utilizes a browser extension to act as a 
