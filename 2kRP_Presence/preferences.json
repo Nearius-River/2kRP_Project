@@ -4,5 +4,5 @@
     "location_text": "In: $location",
     "minigame_text": "Playing a minigame",
     "large_image_text": "$playersonline Players Online - $playersonmap on Current Map",
-    "small_image_text": "2kRP v1.1"
+    "small_image_text": "2kRP v$version"
 }

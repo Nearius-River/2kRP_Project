@@ -4,6 +4,7 @@ from pypresence import Presence
 from dotenv import load_dotenv
 from shared.data import get_data
 from utils.utils import get_preference, get_wiki_image
+from utils.constants import get_app_version
 from color.colors import print_green, print_yellow
 
 # Load environment variables
@@ -31,7 +32,6 @@ MINIGAMES = {
 
 REAL_WORLD_IMAGE = 'https://i.imgur.com/TN8WK7E.png'
 DREAM_WORLD_IMAGE = 'https://i.imgur.com/de3xUvd.png'
-BASE_WIKI_URL = 'https://yume.wiki'
 
 def get_presence_data():
     """
@@ -53,7 +53,8 @@ def get_presence_data():
     DEFAULT_REPLACEMENTS = {
         'location': location or 'Unknown Location',
         'playersonline': players_online,
-        'playersonmap': players_on_map
+        'playersonmap': players_on_map,
+        'version': get_app_version()
     }
     
     # Default messages and images
