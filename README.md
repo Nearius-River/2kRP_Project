@@ -23,7 +23,7 @@ It utilizes a browser extension to act as a
 - Python 3.x (with pip available)
 - Discord (desktop app) installed for updating the Rich Presence (you must be logged in).
 
-### Instructions
+### Instructions (CHANGING IN THE NEAR FUTURE!!)
 
 1. Download the project as a zip and extract (simply pasting the link will auto-download the latest zip):
 
@@ -59,14 +59,18 @@ It utilizes a browser extension to act as a
 
     `$playersonmap`: The count of all players in the current map (the map you're in).
 
+    `$version`: The current application version.
+
 You can use these patterns anywhere you want and in any way you like.
 
 ## Known problems
 
 1. The program uses a simple terminal interface to communicate with the user, giving only the option of minimizing or closing the window.
+
 Proposed solution: Implement a complete graphical interface, with a tab to set user preferences and configure the app.
 
-2. The installation may be too hard for lesser technological people and requires too many steps/configurations to be made
+2. The installation may be too hard for lesser technological people and requires too many steps/configurations to be made.
+
 Proposed solution: Transform the app into a singular .exe file keeping the functionality OR implement better ways to install the app automatically.
 
 ## Contributions
