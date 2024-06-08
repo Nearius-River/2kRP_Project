@@ -3,7 +3,7 @@ import os
 from pypresence import Presence
 from dotenv import load_dotenv
 from shared.data import get_data
-from utils.utils import get_preference
+from utils.utils import get_preference, get_wiki_image
 from color.colors import print_green, print_yellow
 
 # Load environment variables
@@ -31,6 +31,7 @@ MINIGAMES = {
 
 REAL_WORLD_IMAGE = 'https://i.imgur.com/TN8WK7E.png'
 DREAM_WORLD_IMAGE = 'https://i.imgur.com/de3xUvd.png'
+BASE_WIKI_URL = 'https://yume.wiki'
 
 def get_presence_data():
     """
@@ -45,6 +46,7 @@ def get_presence_data():
         badge_image_url = data['badgeImageUrl']
         players_online = data['playersOnline']
         players_on_map = data['playersOnMap']
+        wikiPageUrl = data['wikiPageUrl']
     except KeyError:
         return {'state': 'Getting ready...'}
     
@@ -68,6 +70,11 @@ def get_presence_data():
         details_message = get_preference('real_world_text', DEFAULT_REPLACEMENTS)
         state_message = get_preference('minigame_text', DEFAULT_REPLACEMENTS)
         large_image_url = REAL_WORLD_IMAGE
+
+    # Tries to get wiki image
+    wiki_image = get_wiki_image(wikiPageUrl)
+    if wiki_image:
+        large_image_url = wiki_image
 
     presence_state = {
         'details': details_message,

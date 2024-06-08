@@ -14,11 +14,12 @@ def receive_data():
             return jsonify({"status": "error", "message": "No data provided"}), 400
 
         location = data.get('location')
-        badgeImageUrl = data.get('badgeImageUrl')
-        playersOnline = data.get('playersOnline')
-        playersOnMap = data.get('playersOnMap')
+        badge_image_url = data.get('badgeImageUrl')
+        players_online = data.get('playersOnline')
+        players_on_map = data.get('playersOnMap')
+        wiki_page_url = data.get('wikiPageUrl')
 
-        update_data(location, badgeImageUrl, playersOnline, playersOnMap)
+        update_data(location, badge_image_url, players_online, players_on_map, wiki_page_url)
         return jsonify({"status": "success"})
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)}), 500

@@ -22,6 +22,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
                             badgeImageUrl: message.badgeImageUrl,
                             playersOnline: message.playersOnline,
                             playersOnMap: message.playersOnMap,
+                            wikiPageUrl: message.wikiPageUrl
                         }),
                     });
                 } else {

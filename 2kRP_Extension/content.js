@@ -16,6 +16,17 @@ function getLocation() {
     return null;
 }
 
+function getWikiPageUrl() {
+    const spanElement = document.getElementById('locationText');
+    if (spanElement) {
+        const linkElement = spanElement.querySelector('a');
+        if (linkElement) {
+            return linkElement.href
+        }
+    }
+    return null
+}
+
 function getPlayerCount(elementId) {
     const element = document.getElementById(elementId);
     if (element) {
@@ -37,6 +48,7 @@ function sendAllData() {
     const playersOnMap = getPlayerCount('mapPlayerCountLabel');
     let badgeImageUrl = null;
     const badgeElement = document.querySelector('#badgeButton .badge');
+    const wikiPageUrl = getWikiPageUrl()
 
     if (badgeElement) {
         badgeImageUrl = getBackgroundImageUrl(badgeElement);
@@ -47,7 +59,8 @@ function sendAllData() {
         location, 
         badgeImageUrl, 
         playersOnline, 
-        playersOnMap 
+        playersOnMap,
+        wikiPageUrl
     });
 }
 
