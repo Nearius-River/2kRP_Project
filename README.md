@@ -47,6 +47,8 @@ Most of the data the extension gathers is captured from the HTML elements of the
     CLIENT_ID="102482759437"
     ```
 
+    Once set CLIENT_ID, remove the file to simply ".env".
+
 4. Run the app:
 
     ```sh
