@@ -3,3 +3,4 @@ pypresence
 python-dotenv
 pillow
 pystray
+requests
