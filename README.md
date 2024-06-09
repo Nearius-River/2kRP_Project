@@ -23,8 +23,8 @@ Most of the data the extension gathers is captured from the HTML elements of the
 
 ### Requisites
 
-- Python 3.x (with pip available)
-- Discord (desktop app) installed for updating the Rich Presence (you must be logged in).
+- Python 3.8+ with pip available;
+- Discord desktop app installed for updating the Rich Presence (you must be logged in).
 
 ### Instructions
 
@@ -43,11 +43,11 @@ Most of the data the extension gathers is captured from the HTML elements of the
 3. Open the `.env.example` file and configure it with your client ID:
 
     ```sh
-    # Insert with actual ID:
+    # Edit with actual ID:
     CLIENT_ID="102482759437"
     ```
 
-    Once set CLIENT_ID, remove the file to simply ".env".
+    Once set CLIENT_ID, rename the file to ".env".
 
 4. Run the app:
 
