@@ -1,12 +1,12 @@
 # 2kRP Project
 
-https://ynoproject.net/2kki/
+https://ynoproject.net
 
-This project aims to integrate Discord Rich Presence with Yume 2kki for the navigator, while (hopefully) being easy to use and customize.
+This project aims to integrate Discord Rich Presence with YNO games for the navigator, while (hopefully) being lightweight, easy to use and to customize.
 
-It utilizes a browser extension to act as a "linker", whose primary function is to send site data (such as location and player count) to the running Python application on the user's system through a localhost connection.
+It utilizes a browser extension to act as a "linker", whose primary function is to send site data (such as location, player count, current game, etc) to the running Python application on the user's system through a localhost connection.
 
-Most of the data the extension gathers is captured from the HTML elements of the site itself.
+Most of the data the extension gathers is captured from HTML elements of the site itself.
 
 <div align="center">
     <img src="https://github.com/Nearius-River/2kRP_Project/assets/49107257/d3bdd888-5fb3-43d9-9bba-56c5f0c266f7" alt="Example of how presence looks.">
@@ -19,12 +19,11 @@ Most of the data the extension gathers is captured from the HTML elements of the
 
 ## Installation
 
-**NOTE**: This section only covers the installation for the **Python application**. If you are a normal user, consider using the **packed executable file** instead. This is intended for development only, but you can also use it (and even compile your own executable with it if you feel like it).
-
 ### Requisites
 
 - Python 3.8+ with pip available;
-- Discord desktop app installed for updating the Rich Presence (you must be logged in).
+- 2kRP extension available for the navigator;
+- Discord desktop app installed and running (for updating the rich presence).
 
 ### Instructions
 
@@ -34,22 +33,13 @@ Most of the data the extension gathers is captured from the HTML elements of the
     https://github.com/Nearius-River/2kRP_Project/archive/refs/heads/master.zip
     ```
 
-2. Install the dependecies:
+2. Go to '2kRP_Presence' and install the dependecies:
 
     ```sh
     pip install -r requirements.txt
     ```
 
-3. Open the `.env.example` file and configure it with your client ID:
-
-    ```sh
-    # Edit with actual ID:
-    CLIENT_ID="102482759437"
-    ```
-
-    Once set CLIENT_ID, rename the file to ".env".
-
-4. Run the app:
+3. Run the app:
 
     ```sh
     python app.py
@@ -60,32 +50,26 @@ Most of the data the extension gathers is captured from the HTML elements of the
 ## Usage
 
 - To start the server connection, open app.py and DO NOT close it (doing so will instantly terminate the server connection).
-- If "Connection established!" appears in the terminal, you can go to the Yume 2kki site and start playing. Your presence will be updated as long as the app is running.
-- `preferences.json`: You can customize most of the presence text here. Open it with any text editor (Notepad, Notepad++, etc.) and modify it as desired. Note: some patterns can be used, such as $location or $playersonline. A complete description of the available patterns:
-
-    `$location`: Where you are currently located in the game, e.g., Urotsuki's Room, The Nexus, etc. Defaults to "Unknown Location" if no location is available or unknown.
-
-    `$playersonline`: The total number of players currently playing the game.
-
-    `$playersonmap`: The number of players in the current map (the map you're in).
-
-    `$version`: The current application version.
-
-These patterns can be used anywhere you like.
+- If "Connection established!" appears in the terminal, you can go to the YNO site and pick a game to play. Your presence will be updated as long as the app is running.
+- `preferences.json`: You can customize most of the presence text here. Open it with any text editor (Notepad, Notepad++, etc.) or using the application interface and modify it as desired. Note: some patterns can be used, such as $location or $playersonline. A complete description of the available patterns:
+    - **$gametype**: The YNO game you're currently playing, e.g., Unconscious Online, Yume 2kki, etc.
+    - **$location**: Where you are currently located in the game, e.g., Urotsuki's Room, The Nexus, etc. Defaults to "Unknown Location" if no location is available or unknown.
+    - **$playersonline**: The total number of players currently playing the game.
+    - **$playersonmap**: The number of players in the current map (the map you're in).
+    - **$version**: The current application version.
+    - These patterns can be used anywhere you like. They get updated every 15 seconds, whether you switch rooms or hop from one YNO game to another. Just be sure you're not misspelling anything in case it doesn't seem to work as intended.
 
 ## Known problems
 
-~~1. The program uses a simple terminal interface to communicate with the user, only allowing minimizing or closing the window.~~
+~~The program uses a simple terminal interface to communicate with the user, only allowing minimizing or closing the window.~~
 
 ~~Proposed Solution: Implement a complete graphical interface with tabs for setting user preferences and configuring the app.~~
 
-**Update**: "Solved", with the implementation of the basic GUI interface using tkinter. Though, still needs a BIG visual update before it can be fully considered solved.
+**Solved**, with the implementation of the basic GUI interface using tkinter. (That said, there's still much room for improvement!)
 
-~~2. The installation process may be too complex for less technologically inclined users, requiring multiple steps/configurations.~~
+The installation process may be too complex for less technologically inclined users, requiring multiple steps/configurations.
 
-~~Proposed Solution: Convert the app into a single executable (.exe) file while retaining functionality OR implement more user-friendly installation methods.~~
-
-**Update**: Went with first option, using pyinstaller to help with the generation of a .exe file for the app.
+Proposed Solution: Convert the app into a single executable (.exe) file while retaining functionality OR implement more user-friendly installation methods.
 
 ## Contributions
 
