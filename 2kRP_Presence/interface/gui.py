@@ -117,21 +117,17 @@ class Application(tk.Tk):
         # Initialize settings entries and labels
         self.settings_entries = {}
         settings_labels = {
-            'real_world_text': 'Real World Text',
-            'dream_world_text': 'Dream World Text',
+            'details_text': 'Details Message',
             'location_text': 'Location Text',
-            'minigame_text': 'Minigame Text',
             'large_image_text': 'Large Image Text',
             'small_image_text': 'Small Image Text'
         }
 
         tooltips = {
-            'real_world_text': 'The message that gets displayed while the player is awake.',
-            'dream_world_text': 'The message that will get displayed while the player is dreaming.',
-            'location_text': 'Where you currently are in the game. Changes every time you switch to a different room. Displays \"Unknown Location\" if no location is available.',
-            'minigame_text': 'The message that gets displayed when you are playing a game in the real world.',
-            'large_image_text': 'The text for the large image.',
-            'small_image_text': 'The text for the small image.'
+            'details_text': 'The first message that displays below the site name (YNOProject Online).',
+            'location_text': 'Where you currently are in the game. Returns \"Unknown Location\" if no location is available. Displays below details.',
+            'large_image_text': 'The text that displays when hovering the large image.',
+            'small_image_text': 'The text that displays when hovering the small image.'
         }
 
         # Create entries and labels for settings

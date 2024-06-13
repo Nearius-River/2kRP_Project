@@ -1,4 +1,5 @@
 data_store = {
+    'gameType': None,
     'location': None,
     'badgeImageUrl': None,
     'playersOnline': '0',
@@ -6,8 +7,9 @@ data_store = {
     'wikiPageUrl': None
 }
 
-def update_data(location, badgeImageUrl, playersOnline, playersOnMap, wikiPageUrl):
+def update_data(gameType, location, badgeImageUrl, playersOnline, playersOnMap, wikiPageUrl):
     global data_store
+    data_store['gameType'] = gameType
     data_store['location'] = location
     data_store['badgeImageUrl'] = badgeImageUrl
     data_store['playersOnline'] = playersOnline

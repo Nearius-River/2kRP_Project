@@ -1,6 +1,6 @@
 app_data = {
     'app_name': '2kRP',
-    'app_version': '1.2'
+    'app_version': '1.3'
 }
 
 def get_app_name():

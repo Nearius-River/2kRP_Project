@@ -1,6 +1,7 @@
 import json
 import re
 import requests
+from utils.constants import get_app_version
 from bs4 import BeautifulSoup
 
 BASE_WIKI_URL = 'https://yume.wiki'
@@ -40,39 +41,47 @@ def get_preference(key: str, replacements: dict = None):
     value = config.get(key)
 
     if isinstance(value, str):
+        # Insert constant replacements that don't change
+        replacements.update({
+            'version': get_app_version()
+        })
         value = replace_patterns(value, replacements)
 
     return value
+
+def get_image_link(soup, selector):
+    img_link = soup.select_one(selector)
+    if img_link and img_link['href'].startswith('/File'):
+        thumbborder = soup.select_one('img.thumbborder')
+        if thumbborder:
+            return BASE_WIKI_URL + thumbborder['src']
+    return img_link['href'] if img_link else None
 
 def get_wiki_image(wiki_url: str):
     """
     Tries to get the current room image from yume.wiki website.
     Returns: the image source (direct link) or `None`
     """
-    if wiki_url is None:
+    if not wiki_url:
         return None
 
     try:
         response = requests.get(wiki_url)
+        response.raise_for_status()
         soup = BeautifulSoup(response.content, 'html.parser')
-    except Exception as e:
+    except requests.RequestException as e:
         print(f"Error getting wiki page: {e}")
         return None
 
-    img_link = soup.select_one('#tab-content-facts-list > div > div > div.smw-table.smwfacttable > div:nth-child(2) > div.smw-table-cell.smwprops > a')
+    selectors = [
+        '#tab-content-facts-list > div > div > div.smw-table.smwfacttable > div:nth-child(2) > div.smw-table-cell.smwprops > a',
+        '#tab-content-facts-list > div > div > div.smw-table.smwfacttable > div:nth-child(3) > div.smw-table-cell.smwprops > a',
+        '#mw-content-text > div > table > tbody > tr:nth-child(2) > td > a > img'
+    ]
 
-    # Assumes the fact list does not include the "contributing author" field
-    if img_link:
-        return img_link['href']
-    else:
-        # Assumes the fact list has the "contributing author" field and tries to get from child 3 instead of 2
-        img_link = soup.select_one('#tab-content-facts-list > div > div > div.smw-table.smwfacttable > div:nth-child(3) > div.smw-table-cell.smwprops > a')
-        if img_link:
-            return img_link['href']
-        else:
-            # If all else fails, tries to get image from page thumb instead
-            img_link = soup.select_one('#mw-content-text > div > table > tbody > tr:nth-child(2) > td > a > img')
-            if img_link:
-                return BASE_WIKI_URL + img_link['src']
+    for selector in selectors:
+        image_url = get_image_link(soup, selector)
+        if image_url:
+            return BASE_WIKI_URL + image_url if image_url.startswith('/') else image_url
 
     return None

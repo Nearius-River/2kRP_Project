@@ -1,9 +1,25 @@
 let intervalId = null;
+const supportedGameTypes = [
+    'unconscious',
+    '2kki'
+] // Todo: check for more compatibility between YNO games and this code
 
 // Extracts the first number found in a string
 function extractCount(inputString) {
     const match = inputString.match(/\d+/);
     return match ? match[0] : '0';
+}
+
+function getGameType() {
+    const pathname = window.location.pathname;
+    
+    if (pathname.startsWith('/unconscious/')) {
+        return 'unconscious';
+    } else if (pathname.startsWith('/2kki/')) {
+        return '2kki';
+    } else {
+        return null;
+    }
 }
 
 // Retrieves the location text and the URL from the location span
@@ -37,24 +53,31 @@ function getBackgroundImageUrl(element) {
 
 // Sends all collected data to the background script
 function sendAllData() {
-    const { location, wikiPageUrl } = getLocationData();
-    const playersOnline = getPlayerCount('playerCountLabel');
-    const playersOnMap = getPlayerCount('mapPlayerCountLabel');
-    let badgeImageUrl = null;
-    const badgeElement = document.querySelector('#badgeButton .badge');
+    const gameType = getGameType()
 
-    if (badgeElement) {
-        badgeImageUrl = getBackgroundImageUrl(badgeElement);
+    if (supportedGameTypes.includes(gameType)) {
+        const { location, wikiPageUrl } = getLocationData();
+        const playersOnline = getPlayerCount('playerCountLabel');
+        const playersOnMap = getPlayerCount('mapPlayerCountLabel');
+        let badgeImageUrl = null;
+        const badgeElement = document.querySelector('#badgeButton .badge');
+    
+        if (badgeElement) {
+            badgeImageUrl = getBackgroundImageUrl(badgeElement);
+        }
+    
+        chrome.runtime.sendMessage({
+            type: '2KKI_DATA',
+            gameType,
+            location,
+            badgeImageUrl,
+            playersOnline,
+            playersOnMap,
+            wikiPageUrl
+        });
+    } else {
+        return console.warn('Current game is not supported! Data not sent.')
     }
-
-    chrome.runtime.sendMessage({
-        type: '2KKI_DATA',
-        location,
-        badgeImageUrl,
-        playersOnline,
-        playersOnMap,
-        wikiPageUrl
-    });
 }
 
 // Starts the data collection at regular intervals

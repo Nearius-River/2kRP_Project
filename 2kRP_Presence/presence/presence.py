@@ -4,7 +4,6 @@ from pypresence import Presence
 from dotenv import load_dotenv
 from shared.data import get_data
 from utils.utils import get_preference, get_wiki_image
-from utils.constants import get_app_version
 from color.colors import print_green, print_yellow
 
 # Load environment variables
@@ -13,80 +12,62 @@ load_dotenv()
 CLIENT_ID = os.getenv('CLIENT_ID')
 START_TIME = time.time()
 
-# Define locations and images
-REAL_WORLD_LOCATIONS = {
-    "Urotsuki's Room",
-    "Urotsuki's Balcony",
-    "Sound Room",
-    "Old Sound Room"
-}
+# Defaults
+PLACEHOLDER_IMAGE = 'https://i.imgur.com/TN8WK7E.png'
 
-MINIGAMES = {
-    'Plated Snow Country',
-    'Red Blue Yellow (Mini Game B)',
-    'Red Blue Yellow (Mini Game B) - EX Version',
-    '↑v↑ (Wavy Up)',
-    'Puzzle Game (Kura Puzzle)',
-    'Gimmick Runner'
-}
-
-REAL_WORLD_IMAGE = 'https://i.imgur.com/TN8WK7E.png'
-DREAM_WORLD_IMAGE = 'https://i.imgur.com/de3xUvd.png'
-
-def get_presence_data():
+def fetch_presence_data():
     """
-    Retrieve presence data for Discord rich presence.
-
+    Fetches the current presence data from the game.
+    
     Returns:
         dict: A dictionary with the presence data.
     """
     data = get_data()
     try:
+        game_type = data['gameType']
         location = data['location']
         badge_image_url = data['badgeImageUrl']
         players_online = data['playersOnline']
         players_on_map = data['playersOnMap']
-        wikiPageUrl = data['wikiPageUrl']
+        wiki_page_url = data['wikiPageUrl']
     except KeyError:
-        return {'state': 'Getting ready...'}
+        return {'state': 'Loading game...'}
     
-    DEFAULT_REPLACEMENTS = {
+    if game_type is None:
+        return {'state': 'Loading game...'}
+    
+    # Adjust text for game type
+    game_type = {
+        '2kki': 'Yume 2kki',
+        'unconscious': 'Collective Unconscious'
+    }.get(game_type, game_type)
+
+    default_replacements = {
         'location': location or 'Unknown Location',
         'playersonline': players_online,
         'playersonmap': players_on_map,
-        'version': get_app_version()
+        'gametype': game_type
     }
     
-    # Default messages and images
-    details_message = get_preference('dream_world_text', DEFAULT_REPLACEMENTS)
-    state_message = get_preference('location_text', DEFAULT_REPLACEMENTS)
-    large_image_url = DREAM_WORLD_IMAGE
-    large_image_text = get_preference('large_image_text', DEFAULT_REPLACEMENTS)
+    # Define presence text
+    details_message = get_preference('details_text', default_replacements)
+    state_message = get_preference('location_text', default_replacements)
+    large_image_url = PLACEHOLDER_IMAGE
+    large_image_text = get_preference('large_image_text', default_replacements)
 
-    # Location filtering while in real world
-    if location in REAL_WORLD_LOCATIONS:
-        details_message = get_preference('real_world_text', DEFAULT_REPLACEMENTS)
-        large_image_url = REAL_WORLD_IMAGE
-    elif location in MINIGAMES:
-        details_message = get_preference('real_world_text', DEFAULT_REPLACEMENTS)
-        state_message = get_preference('minigame_text', DEFAULT_REPLACEMENTS)
-        large_image_url = REAL_WORLD_IMAGE
+    # Try to get wiki image
+    wiki_image = get_wiki_image(wiki_page_url)
+    large_image_url = wiki_image if wiki_image else (badge_image_url or PLACEHOLDER_IMAGE)
 
-    # Tries to get wiki image
-    wiki_image = get_wiki_image(wikiPageUrl)
-    if wiki_image:
-        large_image_url = wiki_image
-
-    presence_state = {
+    return {
         'details': details_message,
         'state': state_message,
         'large_image': large_image_url,
         'large_text': large_image_text,
         'small_image': badge_image_url,
-        'small_text': get_preference('small_image_text', DEFAULT_REPLACEMENTS),
+        'small_text': get_preference('small_image_text', default_replacements),
         'start': START_TIME
     }
-    return presence_state
 
 def run_presence(stop_flag):
     """
@@ -104,11 +85,15 @@ def run_presence(stop_flag):
         print(f'The following exception has been raised: {e}')
         time.sleep(30)
         return
-    
+
+    previous_state = None
+
     while not stop_flag.is_set():
         try:
-            data = get_presence_data()
-            presence.update(**data)
+            current_state = fetch_presence_data()
+            if current_state != previous_state:
+                presence.update(**current_state)
+                previous_state = current_state
             time.sleep(15)
         except Exception as e:
             print_yellow(f'An error occurred during presence update: {e}')

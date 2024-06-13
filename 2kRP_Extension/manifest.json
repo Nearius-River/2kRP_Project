@@ -8,13 +8,16 @@
         "storage",
         "http://localhost/7789"
     ],
+    "host_permissions": [
+        "https://ynoproject.net/*"
+    ],
     "background": {
         "scripts": ["background.js"],
         "persistent": false
     },
     "content_scripts": [
         {
-            "matches": ["https://ynoproject.net/2kki/"],
+            "matches": ["https://ynoproject.net/*"],
             "js": ["content.js"]
         }
     ],

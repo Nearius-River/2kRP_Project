@@ -35,6 +35,7 @@ chrome.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
 
         if (isServerActive) {
             await sendDataToServer({
+                gameType: message.gameType,
                 location: message.location,
                 badgeImageUrl: message.badgeImageUrl,
                 playersOnline: message.playersOnline,
