@@ -2,14 +2,22 @@ let intervalId = null;
 const supportedGameTypes = [
     'unconscious',
     '2kki'
-] // Todo: check for more compatibility between YNO games and this code
+] // TODO: check for more compatibility
 
-// Extracts the first number found in a string
+/**
+ * Extracts the first number found in a string
+ * @param {string} inputString
+ * @returns {string}
+ */
 function extractCount(inputString) {
     const match = inputString.match(/\d+/);
     return match ? match[0] : '0';
 }
 
+/**
+ * Determines the game type based on the URL path
+ * @returns {string|null}
+ */
 function getGameType() {
     const pathname = window.location.pathname;
     
@@ -22,7 +30,10 @@ function getGameType() {
     }
 }
 
-// Retrieves the location text and the URL from the location span
+/**
+ * Retrieves the location text and the URL from the location span
+ * @returns {{location: string|null, wikiPageUrl: string|null}}
+ */
 function getLocationData() {
     const spanElement = document.getElementById('locationText');
     if (spanElement) {
@@ -37,13 +48,21 @@ function getLocationData() {
     return { location: null, wikiPageUrl: null };
 }
 
-// Retrieves the player count from a specified element by ID
+/**
+ * Retrieves the player count from a specified element by ID
+ * @param {string} elementId
+ * @returns {string}
+ */
 function getPlayerCount(elementId) {
     const element = document.getElementById(elementId);
     return element ? extractCount(element.innerText) : '0';
 }
 
-// Retrieves the background image URL of a specified element
+/**
+ * Retrieves the background image URL of a specified element
+ * @param {Element} element
+ * @returns {string|null}
+ */
 function getBackgroundImageUrl(element) {
     const style = window.getComputedStyle(element);
     const backgroundImage = style.backgroundImage;
@@ -51,7 +70,9 @@ function getBackgroundImageUrl(element) {
     return urlMatch ? urlMatch[1] : null;
 }
 
-// Sends all collected data to the background script
+/**
+ * Sends all collected data to the background script
+ */
 function sendAllData() {
     const gameType = getGameType()
 
@@ -80,14 +101,18 @@ function sendAllData() {
     }
 }
 
-// Starts the data collection at regular intervals
+/**
+ * Starts the data collection at regular intervals
+ */
 function startCollecting() {
     if (!intervalId) {
         intervalId = setInterval(sendAllData, 15000);
     }
 }
 
-// Stops the data collection
+/**
+ * Stops the data collection
+ */
 function stopCollecting() {
     if (intervalId) {
         clearInterval(intervalId);
