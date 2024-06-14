@@ -14,6 +14,35 @@ START_TIME = time.time()
 
 # Defaults
 PLACEHOLDER_IMAGE = 'https://i.imgur.com/TN8WK7E.png'
+HUB_IMAGE = 'https://static.wikia.nocookie.net/yumenikki/images/9/9c/The_Nexus.png/revision/latest?cb=20110725075611'
+
+game_type_mappings = {
+    '2kki': 'Yume 2kki',
+    'amillusion': 'Amillusion',
+    'braingirl': 'Braingirl',
+    'deepdreams': 'Deep Dreams',
+    'flow': '.flow',
+    'genie': 'Dream Genie',
+    'mikan': 'Mikan Muzou',
+    'muma': 'Muma Rope',
+    'nostalgic': 'nostAlgic',
+    'oversomnia': 'Oversomnia',
+    'prayers': 'Answered Prayers',
+    'sheawaits': 'She Awaits',
+    'someday': 'Someday',
+    'tsushin': 'Yume Tsushin',
+    'unconscious': 'Collective Unconscious',
+    'ultraviolet': 'Ultra Violet',
+    'unevendream': 'Uneven Dream',
+    'yume': 'Yume Nikki'
+}
+
+def get_plural_suffix(count):
+    return '' if count == 1 else 's'
+
+def format_player_count(player_count, entity='Player'):
+    suffix = get_plural_suffix(player_count)
+    return f"{player_count} {entity}{suffix}"
 
 def fetch_presence_data():
     """
@@ -34,30 +63,26 @@ def fetch_presence_data():
         return {'state': 'Loading game...'}
     
     if game_type is None:
-        return {'state': 'Loading game...'}
+        return {'state': 'Picking a game...', 'large_image': HUB_IMAGE}
     
-    # Adjust text for game type
-    game_type = {
-        '2kki': 'Yume 2kki',
-        'unconscious': 'Collective Unconscious'
-    }.get(game_type, game_type)
+    game_type_full = game_type_mappings.get(game_type, game_type)
 
     default_replacements = {
         'location': location or 'Unknown Location',
-        'playersonline': players_online,
-        'playersonmap': players_on_map,
-        'gametype': game_type
+        'playersonline': format_player_count(int(players_online)),
+        'playersonmap': format_player_count(int(players_on_map)),
+        'gametype': game_type_full
     }
     
     # Define presence text
     details_message = get_preference('details_text', default_replacements)
-    state_message = get_preference('location_text', default_replacements)
+    state_message = get_preference('state_text', default_replacements)
     large_image_url = PLACEHOLDER_IMAGE
     large_image_text = get_preference('large_image_text', default_replacements)
 
     # Try to get wiki image
     wiki_image = get_wiki_image(wiki_page_url)
-    large_image_url = wiki_image if wiki_image else (badge_image_url or PLACEHOLDER_IMAGE)
+    large_image_url = wiki_image if wiki_image else PLACEHOLDER_IMAGE
 
     return {
         'details': details_message,
@@ -102,3 +127,4 @@ def run_presence(stop_flag):
     print('Presence ended.')
     presence.clear()
     presence.close()
+    exit(0)

@@ -1,8 +1,24 @@
 let intervalId = null;
 const supportedGameTypes = [
+    '2kki',
+    'amillusion',
+    'braingirl',
+    'deepdreams',
+    'flow',
+    'genie',
+    'mikan',
+    'muma',
+    'nostalgic',
+    'oversomnia',
+    'prayers',
+    'sheawaits',
+    'someday',
+    'tsushin',
+    'ultraviolet',
     'unconscious',
-    '2kki'
-] // TODO: check for more compatibility
+    'unevendream',
+    'yume'
+];
 
 /**
  * Extracts the first number found in a string
@@ -21,13 +37,13 @@ function extractCount(inputString) {
 function getGameType() {
     const pathname = window.location.pathname;
     
-    if (pathname.startsWith('/unconscious/')) {
-        return 'unconscious';
-    } else if (pathname.startsWith('/2kki/')) {
-        return '2kki';
-    } else {
-        return null;
+    for (const gameType of supportedGameTypes) {
+        if (pathname.startsWith(`/${gameType}`)) {
+            return gameType;
+        }
     }
+    
+    return null;
 }
 
 /**
