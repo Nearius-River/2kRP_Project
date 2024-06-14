@@ -19,33 +19,31 @@ Most of the data the extension gathers is captured from HTML elements of the sit
 
 ## Installation
 
-### Requisites
+### Pre-requisites
 
-- Python 3.8+ with pip available;
-- 2kRP extension available for the navigator;
-- Discord desktop app installed and running (for updating the rich presence).
+- **Python 3.8+** with pip available
+- **Chrome/Edge browser** (the extension should work fine on these; not tested on Firefox or other browsers)
+- **Discord desktop app** installed and running (for updating the rich presence)
 
-### Instructions
+### Instructions (for the Python application)
 
-1. Download the project as the zip file and extract it (pasting the link will auto-download the latest zip):
+1. Download and run the `install_script.py` to automatically download and set up all necessary files. This script is available from the project releases.
 
-    ```sh
-    https://github.com/Nearius-River/2kRP_Project/archive/refs/heads/master.zip
-    ```
-
-2. Go to '2kRP_Presence' and install the dependecies:
-
-    ```sh
-    pip install -r requirements.txt
-    ```
-
-3. Run the app:
+2. Navigate to the `2kRP_Presence` directory and run the application:
 
     ```sh
     python app.py
     ```
 
-    Alternatively, you can double-click "app.py" to open it.
+    Alternatively, you can double-click on "app.py" to open it.
+
+### Instructions (for the browser extension)
+
+1. Open your Chrome or Edge browser:
+
+    - **For Chrome**: Click the three dots menu > Extensions > Manage Extensions > Load unpacked, then select the `2kRP_Extension` folder inside `2kRP_Project-master`.
+    
+    - **For Edge**: Click the extensions button > Manage Extensions > Load unpacked, then select the `2kRP_Extension` folder inside `2kRP_Project-master`.
 
 ## Usage
 
