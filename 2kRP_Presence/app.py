@@ -1,7 +1,5 @@
 import logging
 import threading
-import signal
-import sys
 from interface.gui import Application
 from color.colors import print_green
 from presence.presence import run_presence
@@ -33,28 +31,14 @@ class FlaskThread(threading.Thread):
         print('Flask server has ended.')
         self.server.shutdown()
 
-def signal_handler(sig, frame):
-    """Handle SIGINT signal to gracefully shutdown the server and exit."""
-    print('Stopping...')
-    stop_flag.set()
-    flask_thread.shutdown()
-    flask_thread.join()
-    gui_thread.join()
-    presence_thread.join()
-    sys.exit(0)
-
 def greet_user():
     """Print initial user information."""
     print('NOTE: Closing this window will instantly terminate the server connection and undo your current presence on Discord!')
-    print('Press Ctrl+C to close the program at any time (clicking the close button will also do).')
     print('This window will only notify of warnings and errors, if any occurs.')
     print('Have fun travels!')
 
 if __name__ == '__main__':
     greet_user()
-    
-    # Set up the signal handler to catch SIGINT (Ctrl+C)
-    signal.signal(signal.SIGINT, signal_handler)
 
     # Run the Flask app in a separate thread
     flask_thread = FlaskThread()
@@ -70,10 +54,8 @@ if __name__ == '__main__':
     
     # Wait for the GUI thread to finish
     gui_thread.join()
-    print('The app will close automatically in a few seconds...')
 
     # Wait for all other threads to finish
     flask_thread.shutdown()
     flask_thread.join()
     presence_thread.join()
-    sys.exit(0)
