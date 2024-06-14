@@ -117,15 +117,15 @@ class Application(tk.Tk):
         # Initialize settings entries and labels
         self.settings_entries = {}
         settings_labels = {
-            'details_text': 'Details Message',
-            'location_text': 'Location Text',
+            'details_text': 'Presence Details',
+            'state_text': 'Presence State',
             'large_image_text': 'Large Image Text',
             'small_image_text': 'Small Image Text'
         }
 
         tooltips = {
-            'details_text': 'The first message that displays below the site name (YNOProject Online).',
-            'location_text': 'Where you currently are in the game. Returns \"Unknown Location\" if no location is available. Displays below details.',
+            'details_text': 'The first message that displays below the presence title (YNOProject Online).',
+            'state_text': 'The second message that displays below details.',
             'large_image_text': 'The text that displays when hovering the large image.',
             'small_image_text': 'The text that displays when hovering the small image.'
         }

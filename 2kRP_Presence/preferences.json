@@ -1,6 +1,6 @@
 {
     "details_text": "$gametype",
-    "location_text": "In: $location",
-    "large_image_text": "$playersonline Players Online - $playersonmap on Current Map",
+    "state_text": "In: $location",
+    "large_image_text": "$playersonline Online - $playersonmap on Current Map",
     "small_image_text": "2kRP v$version"
 }
