@@ -19,53 +19,63 @@ Most of the data the extension gathers is captured from HTML elements of the sit
 
 ## Installation
 
-### Requisites
+### Pre-requisites
 
-- Python 3.8+ with pip available;
-- 2kRP extension available for the navigator;
-- Discord desktop app installed and running (for updating the rich presence).
+- **Python 3.8+** with pip available
+- **Chrome/Edge browser** (the extension should work fine on these; not tested on Firefox or other browsers)
+- **Discord desktop app** installed and running (for updating the rich presence)
 
-### Instructions
+### Instructions (for the Python application)
 
-1. Download the project as the zip file and extract it (pasting the link will auto-download the latest zip):
+1. Download and run the `install_script.py` to automatically download and set up all necessary files. This script is available from the project releases.
 
-    ```sh
-    https://github.com/Nearius-River/2kRP_Project/archive/refs/heads/master.zip
-    ```
-
-2. Go to '2kRP_Presence' and install the dependecies:
-
-    ```sh
-    pip install -r requirements.txt
-    ```
-
-3. Run the app:
+2. Navigate to the `2kRP_Presence` directory and run the application:
 
     ```sh
     python app.py
     ```
 
-    Alternatively, you can double-click "app.py" to open it.
+    Alternatively, you can double-click on "app.py" to open it.
+
+### Instructions (for the browser extension)
+
+1. Open your Chrome or Edge browser:
+
+    - **For Chrome**: Click the three dots menu > Extensions > Manage Extensions > Load unpacked, then select the `2kRP_Extension` folder inside `2kRP_Project-master`.
+    
+    - **For Edge**: Click the extensions button > Manage Extensions > Load unpacked, then select the `2kRP_Extension` folder inside `2kRP_Project-master`.
 
 ## Usage
 
-- To start the server connection, open app.py and DO NOT close it (doing so will instantly terminate the server connection).
-- If "Connection established!" appears in the terminal, you can go to the YNO site and pick a game to play. Your presence will be updated as long as the app is running.
-- `preferences.json`: You can customize most of the presence text here. Open it with any text editor (Notepad, Notepad++, etc.) or using the application interface and modify it as desired. Note: some patterns can be used, such as $location or $playersonline. A complete description of the available patterns:
-    - **$gametype**: The YNO game you're currently playing, e.g., Unconscious Online, Yume 2kki, etc.
-    - **$location**: Where you are currently located in the game, e.g., Urotsuki's Room, The Nexus, etc. Defaults to "Unknown Location" if no location is available or unknown.
-    - **$playersonline**: The total number of players currently playing the game.
-    - **$playersonmap**: The number of players in the current map (the map you're in).
-    - **$version**: The current application version.
-    - These patterns can be used anywhere you like. They get updated every 15 seconds, whether you switch rooms or hop from one YNO game to another. Just be sure you're not misspelling anything in case it doesn't seem to work as intended.
+### Starting the Server
+
+1. **Open `app.py`**:
+    - Run `app.py` and keep it open. Closing it will terminate the server connection.
+    - If "Connection established!" appears in the terminal, you're connected.
+
+2. **Play a Game**:
+    - Visit the YNO site and pick any Yume game.
+    - Bam! Your presence will be updated as long as the app is running. Truly magical.
+
+### Customizing Presence Text
+
+You can customize most of the presence text using `preferences.json`. Open this file with any text editor (e.g., Notepad, Notepad++, etc.) or through the application interface and modify it as desired.
+
+#### Available Patterns
+
+These patterns can be used to dynamically update the presence text. They get updated every 15 seconds, whether you switch rooms or change YNO games. Just be sure you're not misspelling anything in case it doesn't seem to work well.
+
+- **$gametype**: The YNO game you're currently playing, e.g., Unconscious Online, Yume 2kki, etc.
+- **$location**: Your current location in the game, e.g., Urotsuki's Room, The Nexus, etc. Defaults to "Unknown Location" if no location is available or unknown.
+- **$playersonline**: The total number of players currently playing the game.
+- **$playersonmap**: The number of players in the current map.
+- **$version**: The current application version.
+
+### Important Note
+
+Due to pypresence error handling, if you need to leave an entry empty (for example, the presence state message), insert at least three whitespace characters, like this: `"   "` (notice the blank spaces). Leaving entries fully empty will result in a warning, and your presence won't be updated.
 
 ## Known problems
-
-~~The program uses a simple terminal interface to communicate with the user, only allowing minimizing or closing the window.~~
-
-~~Proposed Solution: Implement a complete graphical interface with tabs for setting user preferences and configuring the app.~~
-
-**Solved**, with the implementation of the basic GUI interface using tkinter. (That said, there's still much room for improvement!)
 
 The installation process may be too complex for less technologically inclined users, requiring multiple steps/configurations.
 
