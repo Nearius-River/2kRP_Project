@@ -62,7 +62,6 @@ def fetch_presence_data():
     except KeyError:
         return {'state': 'Loading game...'}
     
-    print(game_type)
     if game_type is None:
         return {'state': 'Picking a game...', 'large_image': HUB_IMAGE}
     
