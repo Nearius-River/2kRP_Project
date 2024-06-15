@@ -92,7 +92,7 @@ function getBackgroundImageUrl(element) {
 function sendAllData() {
     const gameType = getGameType()
 
-    if (supportedGameTypes.includes(gameType)) {
+    if (supportedGameTypes.includes(gameType) || gameType == null) {
         const { location, wikiPageUrl } = getLocationData();
         const playersOnline = getPlayerCount('playerCountLabel');
         const playersOnMap = getPlayerCount('mapPlayerCountLabel');
