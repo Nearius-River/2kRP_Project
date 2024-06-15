@@ -62,6 +62,7 @@ def fetch_presence_data():
     except KeyError:
         return {'state': 'Loading game...'}
     
+    print(game_type)
     if game_type is None:
         return {'state': 'Picking a game...', 'large_image': HUB_IMAGE}
     
@@ -77,19 +78,35 @@ def fetch_presence_data():
     # Define presence text
     details_message = get_preference('details_text', default_replacements)
     state_message = get_preference('state_text', default_replacements)
-    large_image_url = PLACEHOLDER_IMAGE
     large_image_text = get_preference('large_image_text', default_replacements)
-
-    # Try to get wiki image
-    wiki_image = get_wiki_image(wiki_page_url)
-    large_image_url = wiki_image if wiki_image else PLACEHOLDER_IMAGE
+    small_image_url = badge_image_url
+    
+    # Configure large image url
+    large_image_option = get_preference('large_image_option')
+    if large_image_option == '1': # Use current room image
+        wiki_image = get_wiki_image(wiki_page_url)
+        large_image_url = wiki_image if wiki_image else PLACEHOLDER_IMAGE
+    elif large_image_option == '2': # Use badge image
+        large_image_url = badge_image_url or PLACEHOLDER_IMAGE
+    else: # Custom image
+        large_image_url = get_preference('large_custom_image_url')
+        
+    # Configure small image url
+    small_image_option = get_preference('small_image_option')
+    if small_image_option == '1': # Use current room image
+        wiki_image = get_wiki_image(wiki_page_url)
+        small_image_url = wiki_image if wiki_image else PLACEHOLDER_IMAGE
+    elif small_image_option == '2': # Use badge image
+        small_image_url = badge_image_url or PLACEHOLDER_IMAGE
+    else: # Custom image
+        small_image_url = get_preference('small_custom_image_url')
 
     return {
         'details': details_message,
         'state': state_message,
         'large_image': large_image_url,
         'large_text': large_image_text,
-        'small_image': badge_image_url,
+        'small_image': small_image_url,
         'small_text': get_preference('small_image_text', default_replacements),
         'start': START_TIME
     }

@@ -3,6 +3,7 @@ import tkinter as tk
 from tkinter import ttk
 import pystray
 from PIL import Image
+from utils.utils import validate_url
 from utils.constants import get_app_name, get_app_version
 
 # Define default colors and styles
@@ -13,6 +14,8 @@ BUTTON_BG = '#ff9999'   # Slightly intense pink for buttons
 BUTTON_FG = '#ffffff'   # White text for buttons
 TOOLTIP_BG = '#f99292'  # Dark pink for tooltip background
 
+PLACEHOLDER_IMAGE = 'https://i.imgur.com/TN8WK7E.png'
+
 class Application(tk.Tk):
     """Main tkinter interface."""
     def __init__(self, stop_flag):
@@ -21,7 +24,8 @@ class Application(tk.Tk):
         # Initialize constants and settings
         self.title(get_app_name())
         self.version = get_app_version()
-        self.geometry('350x350')
+        self.geometry('350x600')
+        self.configure(background=TOOLTIP_BG)
         self.stop_flag = stop_flag
 
         # Configure styles
@@ -41,12 +45,20 @@ class Application(tk.Tk):
         self.notebook.add(self.home_tab, text='Home')
         self.notebook.add(self.preferences_tab, text='Preferences')
 
+        # Load preferences
+        self.preferences = self.load_preferences()
+
+        # Initialize image options
+        self.large_image_option = tk.StringVar(value=self.preferences.get('large_image_option', '1'))
+        self.large_custom_image_url = tk.StringVar(value=self.preferences.get('large_custom_image_url', ''))
+        self.small_image_option = tk.StringVar(value=self.preferences.get('small_image_option', '2'))
+        self.small_custom_image_url = tk.StringVar(value=self.preferences.get('small_custom_image_url', ''))
+        
         # Create tab contents
         self.create_home_tab()
         self.create_preferences_tab()
 
-        # Load and update preferences
-        self.preferences = self.load_preferences()
+        # Update preferences tab
         self.update_preferences_tab()
 
         # Set window icon
@@ -141,6 +153,56 @@ class Application(tk.Tk):
 
             self.settings_entries[setting] = entry
 
+        # Create Radioboxes for large image options
+        large_image_label = tk.Label(self.preferences_tab, text='Large Image', font=('Helvetica', 12), bg=DEFAULT_BG, fg=TEXT_COLOR)
+        large_image_label.grid(row=len(self.settings_entries)+1, column=0, columnspan=2, pady=5)
+
+        large_image_frame = tk.Frame(self.preferences_tab, bg=DEFAULT_BG)
+        large_image_frame.grid(row=len(self.settings_entries)+2, column=0, columnspan=2, pady=5)
+
+        tk.Radiobutton(large_image_frame, text='Use current room image', variable=self.large_image_option, value='1', bg=DEFAULT_BG).pack(anchor='w')
+        tk.Radiobutton(large_image_frame, text='Use badge image', variable=self.large_image_option, value='2', bg=DEFAULT_BG).pack(anchor='w')
+        large_custom_image_rb = tk.Radiobutton(large_image_frame, text='Use custom image', variable=self.large_image_option, value='3', bg=DEFAULT_BG)
+        large_custom_image_rb.pack(anchor='w')
+
+        # Add entry for custom large image URL, initially hidden
+        self.large_custom_image_entry = tk.Entry(self.preferences_tab, textvariable=self.large_custom_image_url, width=30, bg=ENTRY_BG, fg=TEXT_COLOR)
+        if self.large_image_option.get() == '3':
+            self.large_custom_image_entry.grid(row=len(self.settings_entries)+3, column=0, columnspan=2, pady=5)
+        
+        def on_large_image_option_change(*args):
+            if self.large_image_option.get() == '3':
+                self.large_custom_image_entry.grid(row=len(self.settings_entries)+3, column=0, columnspan=2, pady=5)
+            else:
+                self.large_custom_image_entry.grid_forget()
+
+        self.large_image_option.trace('w', on_large_image_option_change)
+
+        # Create Radioboxes for small image options
+        small_image_label = tk.Label(self.preferences_tab, text='Small Image', font=('Helvetica', 12), bg=DEFAULT_BG, fg=TEXT_COLOR)
+        small_image_label.grid(row=len(self.settings_entries)+4, column=0, columnspan=2, pady=5)
+
+        small_image_frame = tk.Frame(self.preferences_tab, bg=DEFAULT_BG)
+        small_image_frame.grid(row=len(self.settings_entries)+5, column=0, columnspan=2, pady=5)
+
+        tk.Radiobutton(small_image_frame, text='Use current room image', variable=self.small_image_option, value='1', bg=DEFAULT_BG).pack(anchor='w')
+        tk.Radiobutton(small_image_frame, text='Use badge image', variable=self.small_image_option, value='2', bg=DEFAULT_BG).pack(anchor='w')
+        small_custom_image_rb = tk.Radiobutton(small_image_frame, text='Use custom image', variable=self.small_image_option, value='3', bg=DEFAULT_BG)
+        small_custom_image_rb.pack(anchor='w')
+
+        # Add entry for custom small image URL, initially hidden
+        self.small_custom_image_entry = tk.Entry(self.preferences_tab, textvariable=self.small_custom_image_url, width=30, bg=ENTRY_BG, fg=TEXT_COLOR)
+        if self.small_image_option.get() == '3':
+            self.small_custom_image_entry.grid(row=len(self.settings_entries)+6, column=0, columnspan=2, pady=5)
+        
+        def on_small_image_option_change(*args):
+            if self.small_image_option.get() == '3':
+                self.small_custom_image_entry.grid(row=len(self.settings_entries)+6, column=0, columnspan=2, pady=5)
+            else:
+                self.small_custom_image_entry.grid_forget()
+
+        self.small_image_option.trace('w', on_small_image_option_change)
+
         # Add save button
         save_button = tk.Button(
             self.preferences_tab,
@@ -150,7 +212,7 @@ class Application(tk.Tk):
             fg=BUTTON_FG,
             width=20
         )
-        save_button.grid(row=len(self.settings_entries)+1, column=0, columnspan=2, pady=10)
+        save_button.grid(row=len(self.settings_entries)+7, column=0, columnspan=2, pady=10)
 
     def create_tooltip(self, widget, text):
         """Generates a small tooltip when user hovers the mouse above the label."""
@@ -199,11 +261,27 @@ class Application(tk.Tk):
         for setting, entry in self.settings_entries.items():
             entry.delete(0, 'end')
             entry.insert(0, self.preferences.get(setting, ''))
+        self.large_image_option.set(self.preferences.get('large_image_option', '1'))
+        self.large_custom_image_url.set(self.preferences.get('large_custom_image_url', ''))
+        self.small_image_option.set(self.preferences.get('small_image_option', '2'))
+        self.small_custom_image_url.set(self.preferences.get('small_custom_image_url', ''))
 
     def save_preferences(self):
         """Saves entries from settings tab into the preferences file."""
         for setting, entry in self.settings_entries.items():
             self.preferences[setting] = entry.get()
+        self.preferences['large_image_option'] = self.large_image_option.get()
+        self.preferences['large_custom_image_url'] = self.large_custom_image_url.get()
+        self.preferences['small_image_option'] = self.small_image_option.get()
+        self.preferences['small_custom_image_url'] = self.small_custom_image_url.get()
+        
+        # Validate URLs and set to default if invalid
+        if not validate_url(self.preferences['large_custom_image_url']):
+            self.preferences['large_custom_image_url'] = PLACEHOLDER_IMAGE
+        
+        if not validate_url(self.preferences['small_custom_image_url']):
+            self.preferences['small_custom_image_url'] = PLACEHOLDER_IMAGE
+        
         self.save_to_file()
 
     def save_to_file(self):
