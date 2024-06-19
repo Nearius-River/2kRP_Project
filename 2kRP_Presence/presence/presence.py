@@ -1,15 +1,10 @@
 import time
-import os
 from pypresence import Presence
-from dotenv import load_dotenv
 from shared.data import get_data
 from utils.utils import get_preference, get_wiki_image
 from color.colors import print_green, print_yellow
 
-# Load environment variables
-load_dotenv()
-
-CLIENT_ID = os.getenv('CLIENT_ID')
+CLIENT_ID = '1246902701535793324'
 START_TIME = time.time()
 
 # Defaults
