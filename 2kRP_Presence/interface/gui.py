@@ -7,12 +7,12 @@ from utils.utils import validate_url
 from utils.constants import get_app_name, get_app_version
 
 # Define default colors and styles
-DEFAULT_BG = '#ffcccc'  # Soft pink background
-ENTRY_BG = '#ffb8b8'    # Slightly darker pink for entry background
-TEXT_COLOR = '#333333'  # Dark text color for contrast
-BUTTON_BG = '#ff9999'   # Slightly intense pink for buttons
-BUTTON_FG = '#ffffff'   # White text for buttons
-TOOLTIP_BG = '#f99292'  # Dark pink for tooltip background
+DEFAULT_BG = '#ffcccc'
+ENTRY_BG = '#ffb8b8'
+TEXT_COLOR = '#333333'
+BUTTON_BG = '#ff9999'
+BUTTON_FG = '#ffffff'
+TOOLTIP_BG = '#f99292'
 
 PLACEHOLDER_IMAGE = 'https://i.imgur.com/TN8WK7E.png'
 
@@ -20,13 +20,39 @@ class Application(tk.Tk):
     """Main tkinter interface."""
     def __init__(self, stop_flag):
         super().__init__()
+        self.init_ui()
+        self.stop_flag = stop_flag
 
-        # Initialize constants and settings
+        # Load preferences
+        self.preferences = self.load_preferences()
+
+        # Initialize image options
+        self.large_image_option = tk.StringVar(value=self.preferences.get('large_image_option', '1'))
+        self.large_custom_image_url = tk.StringVar(value=self.preferences.get('large_custom_image_url', ''))
+        self.small_image_option = tk.StringVar(value=self.preferences.get('small_image_option', '2'))
+        self.small_custom_image_url = tk.StringVar(value=self.preferences.get('small_custom_image_url', ''))
+
+        # Create tab contents
+        self.create_home_tab()
+        self.create_preferences_tab()
+
+        # Update preferences tab
+        self.update_preferences_tab()
+
+        # Set window icon
+        self.set_window_icon('images/madotsuki.ico')
+
+        # Create system tray
+        self.create_system_tray('images/madotsuki.ico')
+
+        # Handle window closing
+        self.protocol("WM_DELETE_WINDOW", self.terminate)
+
+    def init_ui(self):
         self.title(get_app_name())
         self.version = get_app_version()
         self.geometry('350x600')
         self.configure(background=TOOLTIP_BG)
-        self.stop_flag = stop_flag
 
         # Configure styles
         self.style = ttk.Style()
@@ -45,27 +71,10 @@ class Application(tk.Tk):
         self.notebook.add(self.home_tab, text='Home')
         self.notebook.add(self.preferences_tab, text='Preferences')
 
-        # Load preferences
-        self.preferences = self.load_preferences()
-
-        # Initialize image options
-        self.large_image_option = tk.StringVar(value=self.preferences.get('large_image_option', '1'))
-        self.large_custom_image_url = tk.StringVar(value=self.preferences.get('large_custom_image_url', ''))
-        self.small_image_option = tk.StringVar(value=self.preferences.get('small_image_option', '2'))
-        self.small_custom_image_url = tk.StringVar(value=self.preferences.get('small_custom_image_url', ''))
-        
-        # Create tab contents
-        self.create_home_tab()
-        self.create_preferences_tab()
-
-        # Update preferences tab
-        self.update_preferences_tab()
-
-        # Set window icon
-        icon_path = 'images/madotsuki.ico'
+    def set_window_icon(self, icon_path):
         self.iconbitmap(icon_path)
 
-        # Create system tray
+    def create_system_tray(self, icon_path):
         self.tray = pystray.Icon(
             get_app_name(),
             Image.open(icon_path),
@@ -74,60 +83,15 @@ class Application(tk.Tk):
         )
         self.tray.run_detached()
 
-        # Handle window closing
-        self.protocol("WM_DELETE_WINDOW", self.terminate)
-
     def create_home_tab(self):
-        title_label = tk.Label(
-            self.home_tab,
-            text=f'Yume 2kki Rich Presence ({get_app_name()})',
-            font=('Helvetica', 16),
-            bg=DEFAULT_BG,
-            fg=TEXT_COLOR
-        )
-        title_label.pack(pady=10)
-
-        version_label = tk.Label(
-            self.home_tab,
-            text=f'App version: {self.version}',
-            font=('Helvetica', 10),
-            bg=DEFAULT_BG,
-            fg=TEXT_COLOR
-        )
-        version_label.pack(pady=10)
-
-        minimize_button = tk.Button(
-            self.home_tab,
-            text='Minimize to Tray',
-            command=self.minimize_to_tray,
-            bg=BUTTON_BG,
-            fg=BUTTON_FG,
-            width=20
-        )
-        minimize_button.pack(pady=5)
-
-        stop_button = tk.Button(
-            self.home_tab,
-            text='Stop',
-            command=self.terminate,
-            bg=BUTTON_BG,
-            fg=BUTTON_FG,
-            width=20
-        )
-        stop_button.pack(pady=5)
+        self.create_label(self.home_tab, f'Yume 2kki Rich Presence ({get_app_name()})', 16, 10)
+        self.create_label(self.home_tab, f'App version: {self.version}', 10, 10)
+        self.create_button(self.home_tab, 'Minimize to Tray', self.minimize_to_tray, 20, 5)
+        self.create_button(self.home_tab, 'Stop', self.terminate, 20, 5)
 
     def create_preferences_tab(self):
-        title_label = tk.Label(
-            self.preferences_tab,
-            text='Presence preferences',
-            font=('Helvetica', 16),
-            bg=DEFAULT_BG,
-            fg=TEXT_COLOR
-        )
-        title_label.grid(row=0, column=0, columnspan=2, pady=10)
+        self.create_label(self.preferences_tab, 'Presence preferences', 16, 10, row=0, column=0, columnspan=2)
 
-        # Initialize settings entries and labels
-        self.settings_entries = {}
         settings_labels = {
             'details_text': 'Presence Details',
             'state_text': 'Presence State',
@@ -142,77 +106,54 @@ class Application(tk.Tk):
             'small_image_text': 'The text that displays when hovering the small image.'
         }
 
-        # Create entries and labels for settings
+        self.settings_entries = {}
         for i, (setting, label_text) in enumerate(settings_labels.items()):
-            label = ttk.Label(self.preferences_tab, text=label_text, style='Custom.TLabel')
-            label.grid(row=i+1, column=0, padx=10, pady=5)
-            self.create_tooltip(label, tooltips[setting])
-
-            entry = tk.Entry(self.preferences_tab, width=30, bg=ENTRY_BG, fg=TEXT_COLOR)
-            entry.grid(row=i+1, column=1, padx=10, pady=5)
-
+            self.create_label(self.preferences_tab, label_text, 10, 5, row=i+1, column=0)
+            entry = self.create_entry(self.preferences_tab, 30, row=i+1, column=1)
+            self.create_tooltip(entry, tooltips[setting])
             self.settings_entries[setting] = entry
 
-        # Create Radioboxes for large image options
-        large_image_label = tk.Label(self.preferences_tab, text='Large Image', font=('Helvetica', 12), bg=DEFAULT_BG, fg=TEXT_COLOR)
-        large_image_label.grid(row=len(self.settings_entries)+1, column=0, columnspan=2, pady=5)
+        self.create_image_option(self.preferences_tab, 'Large Image', self.large_image_option, self.large_custom_image_url, len(settings_labels)+1)
+        self.create_image_option(self.preferences_tab, 'Small Image', self.small_image_option, self.small_custom_image_url, len(settings_labels)+4)
 
-        large_image_frame = tk.Frame(self.preferences_tab, bg=DEFAULT_BG)
-        large_image_frame.grid(row=len(self.settings_entries)+2, column=0, columnspan=2, pady=5)
+        self.create_button(self.preferences_tab, 'Save', self.save_preferences, 20, 10, row=len(settings_labels)+7, column=0, columnspan=2)
 
-        tk.Radiobutton(large_image_frame, text='Use current room image', variable=self.large_image_option, value='1', bg=DEFAULT_BG).pack(anchor='w')
-        tk.Radiobutton(large_image_frame, text='Use badge image', variable=self.large_image_option, value='2', bg=DEFAULT_BG).pack(anchor='w')
-        large_custom_image_rb = tk.Radiobutton(large_image_frame, text='Use custom image', variable=self.large_image_option, value='3', bg=DEFAULT_BG)
-        large_custom_image_rb.pack(anchor='w')
+    def create_label(self, parent, text, font_size, pady, **grid_opts):
+        label = tk.Label(parent, text=text, font=('Helvetica', font_size), bg=DEFAULT_BG, fg=TEXT_COLOR)
+        label.grid(pady=pady, **grid_opts)
+        return label
 
-        # Add entry for custom large image URL, initially hidden
-        self.large_custom_image_entry = tk.Entry(self.preferences_tab, textvariable=self.large_custom_image_url, width=30, bg=ENTRY_BG, fg=TEXT_COLOR)
-        if self.large_image_option.get() == '3':
-            self.large_custom_image_entry.grid(row=len(self.settings_entries)+3, column=0, columnspan=2, pady=5)
+    def create_entry(self, parent, width, **grid_opts):
+        entry = tk.Entry(parent, width=width, bg=ENTRY_BG, fg=TEXT_COLOR)
+        entry.grid(padx=10, pady=5, **grid_opts)
+        return entry
+
+    def create_button(self, parent, text, command, width, pady, **grid_opts):
+        button = tk.Button(parent, text=text, command=command, bg=BUTTON_BG, fg=BUTTON_FG, width=width)
+        button.grid(pady=pady, **grid_opts)
+        return button
+
+    def create_image_option(self, parent, label_text, image_option_var, custom_image_url_var, start_row):
+        self.create_label(parent, label_text, 12, 5, row=start_row, column=0, columnspan=2)
+        frame = tk.Frame(parent, bg=DEFAULT_BG)
+        frame.grid(row=start_row+1, column=0, columnspan=2, pady=5)
+
+        tk.Radiobutton(frame, text='Use current room image', variable=image_option_var, value='1', bg=DEFAULT_BG).pack(anchor='w')
+        tk.Radiobutton(frame, text='Use badge image', variable=image_option_var, value='2', bg=DEFAULT_BG).pack(anchor='w')
+        custom_image_rb = tk.Radiobutton(frame, text='Use custom image', variable=image_option_var, value='3', bg=DEFAULT_BG)
+        custom_image_rb.pack(anchor='w')
+
+        custom_image_entry = tk.Entry(parent, textvariable=custom_image_url_var, width=30, bg=ENTRY_BG, fg=TEXT_COLOR)
+        if image_option_var.get() == '3':
+            custom_image_entry.grid(row=start_row+2, column=0, columnspan=2, pady=5)
         
-        def on_large_image_option_change(*args):
-            if self.large_image_option.get() == '3':
-                self.large_custom_image_entry.grid(row=len(self.settings_entries)+3, column=0, columnspan=2, pady=5)
+        def on_image_option_change(*args):
+            if image_option_var.get() == '3':
+                custom_image_entry.grid(row=start_row+2, column=0, columnspan=2, pady=5)
             else:
-                self.large_custom_image_entry.grid_forget()
+                custom_image_entry.grid_forget()
 
-        self.large_image_option.trace('w', on_large_image_option_change)
-
-        # Create Radioboxes for small image options
-        small_image_label = tk.Label(self.preferences_tab, text='Small Image', font=('Helvetica', 12), bg=DEFAULT_BG, fg=TEXT_COLOR)
-        small_image_label.grid(row=len(self.settings_entries)+4, column=0, columnspan=2, pady=5)
-
-        small_image_frame = tk.Frame(self.preferences_tab, bg=DEFAULT_BG)
-        small_image_frame.grid(row=len(self.settings_entries)+5, column=0, columnspan=2, pady=5)
-
-        tk.Radiobutton(small_image_frame, text='Use current room image', variable=self.small_image_option, value='1', bg=DEFAULT_BG).pack(anchor='w')
-        tk.Radiobutton(small_image_frame, text='Use badge image', variable=self.small_image_option, value='2', bg=DEFAULT_BG).pack(anchor='w')
-        small_custom_image_rb = tk.Radiobutton(small_image_frame, text='Use custom image', variable=self.small_image_option, value='3', bg=DEFAULT_BG)
-        small_custom_image_rb.pack(anchor='w')
-
-        # Add entry for custom small image URL, initially hidden
-        self.small_custom_image_entry = tk.Entry(self.preferences_tab, textvariable=self.small_custom_image_url, width=30, bg=ENTRY_BG, fg=TEXT_COLOR)
-        if self.small_image_option.get() == '3':
-            self.small_custom_image_entry.grid(row=len(self.settings_entries)+6, column=0, columnspan=2, pady=5)
-        
-        def on_small_image_option_change(*args):
-            if self.small_image_option.get() == '3':
-                self.small_custom_image_entry.grid(row=len(self.settings_entries)+6, column=0, columnspan=2, pady=5)
-            else:
-                self.small_custom_image_entry.grid_forget()
-
-        self.small_image_option.trace('w', on_small_image_option_change)
-
-        # Add save button
-        save_button = tk.Button(
-            self.preferences_tab,
-            text='Save',
-            command=self.save_preferences,
-            bg=BUTTON_BG,
-            fg=BUTTON_FG,
-            width=20
-        )
-        save_button.grid(row=len(self.settings_entries)+7, column=0, columnspan=2, pady=10)
+        image_option_var.trace('w', on_image_option_change)
 
     def create_tooltip(self, widget, text):
         """Generates a small tooltip when user hovers the mouse above the label."""
