@@ -2,32 +2,32 @@ body {
     font-family: Arial, sans-serif;
     width: 300px;
     padding: 10px;
-    background-color: #f0f0f0;
-    border: 1px solid #ccc;
+    background-color: #ffe6f2;
+    border: 1px solid #ff99cc;
     border-radius: 8px;
     box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
 }
 
-#popup-content {
+#popup-content, #settings-content {
     text-align: center;
 }
 
 h1 {
     font-size: 20px;
     margin-bottom: 15px;
-    color: #333;
+    color: #cc0066;
 }
 
-p {
+p, label {
     font-size: 14px;
-    margin-bottom: 20px;
-    color: #666;
+    color: #b30059;
 }
 
 #server-status {
     font-size: 12px;
-    color: #888;
-    margin-bottom: 20px;
+    color: #cc6699;
+    margin-bottom: 15px;
+    font-weight: normal;
 }
 
 .switch {
@@ -48,7 +48,7 @@ p {
     left: 0;
     right: 0;
     bottom: 0;
-    background-color: #ccc;
+    background-color: #ff99cc;
     transition: 0.4s;
     border-radius: 20px;
 }
@@ -66,7 +66,7 @@ p {
 }
 
 input:checked + .slider {
-    background-color: #1e88e5;
+    background-color: #e91e63;
 }
 
 input:checked + .slider:before {
@@ -83,18 +83,84 @@ input:checked + .slider:before {
 
 #switch-info {
     font-size: 12px;
-    color: #888;
+    color: #cc6699;
     margin-bottom: 20px;
 }
 
 #github-link {
     display: inline-block;
     font-size: 14px;
-    color: #1e88e5;
+    color: #e91e63;
     text-decoration: none;
-    transition: color 0.3s;
+    transition: color 0.3s, transform 0.3s;
+    margin-bottom: 5px;
 }
 
 #github-link:hover {
-    color: #0d47a1; 
+    color: #ad1457;
+    transform: scale(1.1);
+}
+
+button {
+    background-color: #e91e63;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 15px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.3s;
+    margin: 10px 5px;
+}
+
+button:hover {
+    background-color: #ad1457;
+    transform: scale(1.05);
+}
+
+select {
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0;
+    border-radius: 8px;
+    border: 1px solid #ff99cc;
+    background-color: #ffe6f2;
+    color: #b30059;
+    font-size: 14px;
+    outline: none;
+}
+
+select:focus {
+    border-color: #e91e63;
+}
+
+.checkbox-container {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin: 20px 0;
+}
+
+.checkbox-container label {
+    background-color: #ffe6f2;
+    border: 1px solid #ff99cc;
+    border-radius: 8px;
+    padding: 10px;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    font-size: 12px;
+    transition: background-color 0.3s, border-color 0.3s;
+    word-break: break-all;
+    overflow: hidden;
+}
+
+.checkbox-container label:hover {
+    background-color: #ff99cc;
+    border-color: #e91e63;
+}
+
+.checkbox-container input[type="checkbox"] {
+    margin-right: 10px;
+    flex-shrink: 0;
 }

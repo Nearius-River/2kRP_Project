@@ -15,10 +15,11 @@ function updateServerStatus(isServerActive) {
     const serverStatus = document.getElementById('server-status');
     if (isServerActive) {
         serverStatus.textContent = 'Server is up and running!';
-        serverStatus.style.color = 'green';
+        serverStatus.style.color = '#4caf50';
     } else {
-        serverStatus.textContent = 'Server is inactive! Be sure the receiver app is running.';
-        serverStatus.style.color = 'red';
+        serverStatus.textContent = 'Server is not running!';
+        serverStatus.style.color = '#e91e63';
+        serverStatus.style.fontWeight = 'bold';
     }
 }
 
@@ -28,6 +29,17 @@ document.addEventListener('DOMContentLoaded', async function () {
     // Restore the switch state from storage
     chrome.storage.sync.get('extensionEnabled', function (data) {
         toggleSwitch.checked = data.extensionEnabled !== false;
+    });
+
+    // Popup navigation buttons behavior
+    document.getElementById('settings-button').addEventListener('click', function() {
+        document.getElementById('popup-content').style.display = 'none';
+        document.getElementById('settings-content').style.display = 'block';
+    });
+    
+    document.getElementById('back-button').addEventListener('click', function() {
+        document.getElementById('settings-content').style.display = 'none';
+        document.getElementById('popup-content').style.display = 'block';
     });
 
     // Check server status

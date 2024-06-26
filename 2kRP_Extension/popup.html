@@ -1,24 +1,52 @@
 <!DOCTYPE html>
 <html>
-
-<head>
-    <title>Yume 2kki Rich Presence (2kRP)</title>
-    <link rel="stylesheet" type="text/css" href="popup.css">
-</head>
-
-<body>
-    <div id="popup-content">
-        <h1>Yume 2kki Rich Presence (2kRP)</h1>
-        <p>Show your friends your dream travels on Discord or something like that.</p>
-        <p id="server-status">Checking server status...</p>
-        <label class="switch">
-            <input type="checkbox" id="toggle-switch">
-            <span class="slider round"></span>
-        </label>
-        <p id="switch-info">Enable 2kRP</p>
-        <a href="https://github.com/Nearius-River/2kRP_Project/tree/master" target="_blank" id="github-link">GitHub Repository</a>
-    </div>
-    <script src="popup.js"></script>
-</body>
-
+    <head>
+        <title>2kRP</title>
+        <link rel="stylesheet" type="text/css" href="popup.css">
+    </head>
+    <body>
+        <div id="popup-content">
+            <h1>Yume 2kki Rich Presence (2kRP)</h1>
+            <p>Show your friends your dream travels on Discord or something like that.</p>
+            <p id="server-status">Checking server status...</p>
+            <label class="switch">
+                <input type="checkbox" id="toggle-switch">
+                <span class="slider round"></span>
+            </label>
+            <p id="switch-info">Toggle extension</p>
+            <a href="https://github.com/Nearius-River/2kRP_Project/tree/master" target="_blank" id="github-link">GitHub Repository</a>
+            <br>
+            <button id="settings-button">Settings</button>
+        </div>
+        <div id="settings-content" style="display:none;">
+            <h1>Settings</h1>
+            <label for="options-select">Extension Language</label>
+            <select id="options-select">
+                <option value="english">English</option>
+            </select>
+            <label>Should be active in the following games:</label>
+            <div class="checkbox-container">
+                <label><input type="checkbox" name="2kki"> Yume 2kki</label>
+                <label><input type="checkbox" name="amillusion"> Amillusion</label>
+                <label><input type="checkbox" name="braingirl"> Brain Girl</label>
+                <label><input type="checkbox" name="deepdreams"> Deep Dreams</label>
+                <label><input type="checkbox" name="flow"> .flow</label>
+                <label><input type="checkbox" name="genie"> Dream Genie</label>
+                <label><input type="checkbox" name="mikan"> Mikan Muzou</label>
+                <label><input type="checkbox" name="muma"> Muma Rope</label>
+                <label><input type="checkbox" name="nostalgic"> NostAlgic</label>
+                <label><input type="checkbox" name="oversomina"> Oversomnia</label>
+                <label><input type="checkbox" name="prayers"> Answered Prayers</label>
+                <label><input type="checkbox" name="sheawaits"> She Awaits</label>
+                <label><input type="checkbox" name="someday"> Someday</label>
+                <label><input type="checkbox" name="tsushin"> Yume Tsushin</label>
+                <label><input type="checkbox" name="ultraviolet"> Ultra Violet</label>
+                <label><input type="checkbox" name="unconscious"> Collective Unconscious</label>
+                <label><input type="checkbox" name="unevendream"> Uneven Dream</label>
+                <label><input type="checkbox" name="yume"> Yume Nikki</label>
+            </div>
+            <button id="back-button">Back</button>
+        </div>
+        <script src="popup.js"></script>
+    </body>
 </html>
