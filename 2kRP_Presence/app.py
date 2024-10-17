@@ -5,6 +5,7 @@ from color.colors import print_green
 from presence.presence import run_presence
 from server.server import create_app
 from werkzeug.serving import make_server
+from utils.utils import get_translated_string
 
 # Configure logging
 log = logging.getLogger('werkzeug')
@@ -23,19 +24,17 @@ class FlaskThread(threading.Thread):
 
     def run(self):
         """Run the Flask server."""
-        print_green('Flask server established!')
+        print_green(get_translated_string('flask_server_start'))
         self.server.serve_forever()
 
     def shutdown(self):
         """Shutdown the Flask server."""
-        print('Flask server has ended.')
+        print(get_translated_string('flask_server_end'))
         self.server.shutdown()
 
 def greet_user():
     """Print initial user information."""
-    print('NOTE: Closing this window will instantly terminate the server connection and undo your current presence on Discord!')
-    print('This window will only notify of warnings and errors, if any occurs.')
-    print('Have fun travels!')
+    print(get_translated_string('greeting'))
 
 if __name__ == '__main__':
     greet_user()
