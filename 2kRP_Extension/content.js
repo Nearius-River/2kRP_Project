@@ -6,9 +6,11 @@ const supportedGameTypes = [
     'deepdreams',
     'flow',
     'genie',
+    'if',
     'mikan',
     'muma',
     'nostalgic',
+    'oneshot',
     'oversomnia',
     'prayers',
     'sheawaits',
@@ -67,11 +69,11 @@ function getLocationData() {
 /**
  * Retrieves the player count from a specified element by ID
  * @param {string} elementId
- * @returns {string}
+ * @returns {number}
  */
 function getPlayerCount(elementId) {
     const element = document.getElementById(elementId);
-    return element ? extractCount(element.innerText) : '0';
+    return element ? parseInt(extractCount(element.innerText)) : 0;
 }
 
 /**

@@ -1,7 +1,7 @@
 import time
 from pypresence import Presence
 from shared.data import get_data
-from utils.utils import get_preference, get_wiki_image
+from utils.utils import get_presence_preference, get_wiki_image, get_translated_string
 from color.colors import print_green, print_yellow
 
 CLIENT_ID = '1246902701535793324'
@@ -18,9 +18,11 @@ game_type_mappings = {
     'deepdreams': 'Deep Dreams',
     'flow': '.flow',
     'genie': 'Dream Genie',
+    'if': 'If',
     'mikan': 'Mikan Muzou',
     'muma': 'Muma Rope',
     'nostalgic': 'nostAlgic',
+    'oneshot': 'Oneshot',
     'oversomnia': 'Oversomnia',
     'prayers': 'Answered Prayers',
     'sheawaits': 'She Awaits',
@@ -48,60 +50,60 @@ def fetch_presence_data():
     """
     data = get_data()
     try:
-        game_type = data['gameType']
+        game_type = data['game_type']
         location = data['location']
-        badge_image_url = data['badgeImageUrl']
-        players_online = data['playersOnline']
-        players_on_map = data['playersOnMap']
-        wiki_page_url = data['wikiPageUrl']
+        badge_image_url = data['badge_image_url']
+        players_online = data['players_online']
+        players_on_map = data['players_on_map']
+        wiki_page_url = data['wiki_page_url']
     except KeyError:
-        return {'state': 'Loading game...'}
+        return {'state': get_translated_string('presence_loading_game')}
     
     if game_type is None:
-        return {'state': 'Picking a game...', 'large_image': HUB_IMAGE}
+        return {'state': get_translated_string('presence_picking_game'), 'large_image': HUB_IMAGE}
     
     game_type_full = game_type_mappings.get(game_type, game_type)
 
     default_replacements = {
-        'location': location or 'Unknown Location',
-        'playersonline': format_player_count(int(players_online)),
-        'playersonmap': format_player_count(int(players_on_map)),
+        'location': location or get_translated_string('presence_no_location'),
+        'playersonline': format_player_count(players_online),
+        'playersonmap': format_player_count(players_on_map),
         'gametype': game_type_full
     }
     
     # Define presence text
-    details_message = get_preference('details_text', default_replacements)
-    state_message = get_preference('state_text', default_replacements)
-    large_image_text = get_preference('large_image_text', default_replacements)
+    details_message = get_presence_preference('details_text', default_replacements)
+    state_message = get_presence_preference('state_text', default_replacements)
+    large_image_text = get_presence_preference('large_image_text', default_replacements)
     small_image_url = badge_image_url
     
     # Configure large image url
-    large_image_option = get_preference('large_image_option')
+    large_image_option = get_presence_preference('large_image_option')
     if large_image_option == '1': # Use current room image
         wiki_image = get_wiki_image(wiki_page_url)
         large_image_url = wiki_image if wiki_image else PLACEHOLDER_IMAGE
     elif large_image_option == '2': # Use badge image
         large_image_url = badge_image_url or PLACEHOLDER_IMAGE
     else: # Custom image
-        large_image_url = get_preference('large_custom_image_url')
+        large_image_url = get_presence_preference('large_custom_image_url')
         
     # Configure small image url
-    small_image_option = get_preference('small_image_option')
+    small_image_option = get_presence_preference('small_image_option')
     if small_image_option == '1': # Use current room image
         wiki_image = get_wiki_image(wiki_page_url)
         small_image_url = wiki_image if wiki_image else PLACEHOLDER_IMAGE
     elif small_image_option == '2': # Use badge image
         small_image_url = badge_image_url or PLACEHOLDER_IMAGE
     else: # Custom image
-        small_image_url = get_preference('small_custom_image_url')
-
+        small_image_url = get_presence_preference('small_custom_image_url')
+    
     return {
         'details': details_message,
         'state': state_message,
         'large_image': large_image_url,
         'large_text': large_image_text,
         'small_image': small_image_url,
-        'small_text': get_preference('small_image_text', default_replacements),
+        'small_text': get_presence_preference('small_image_text', default_replacements),
         'start': START_TIME
     }
 
@@ -115,10 +117,9 @@ def run_presence(stop_flag):
     presence = Presence(CLIENT_ID)
     try:
         presence.connect()
-        print_green('Connection with Discord client established!')
+        print_green(get_translated_string('client_connected'))
     except Exception as e:
-        print_yellow('WARNING: The application returned an exception trying to connect. This is probably due to Discord not being properly detected.')
-        print(f'The following exception has been raised: {e}')
+        print_yellow(get_translated_string('client_connected_exception'), e)
         time.sleep(30)
         return
 
@@ -132,10 +133,10 @@ def run_presence(stop_flag):
                 previous_state = current_state
             time.sleep(15)
         except Exception as e:
-            print_yellow(f'An error occurred during presence update: {e}')
+            print_yellow(get_translated_string('client_update_exception'), e)
             time.sleep(15)
     
-    print('Presence ended.')
+    print(get_translated_string('client_disconnect'))
     presence.clear()
     presence.close()
     exit(0)
