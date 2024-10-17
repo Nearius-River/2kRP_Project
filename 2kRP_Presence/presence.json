@@ -1,7 +1,7 @@
 {
-    "details_text": "$gametype",
+    "details_text": "Playing $gametype",
     "state_text": "In: $location",
-    "large_image_text": "$playersonline Online - $playersonmap on Current Map",
+    "large_image_text": "$playersonline Online | $playersonmap on Current Map",
     "small_image_text": "2kRP v$version",
     "large_image_option": "1",
     "large_custom_image_url": "https://i.imgur.com/TN8WK7E.png",
