@@ -3,7 +3,7 @@ import tkinter as tk
 from tkinter import ttk
 import pystray
 from PIL import Image
-from utils.utils import validate_url
+from utils.utils import validate_url, get_translated_string, get_settings
 from utils.constants import get_app_name, get_app_version
 
 # Define default colors and styles
@@ -24,20 +24,22 @@ class Application(tk.Tk):
         self.stop_flag = stop_flag
 
         # Load preferences
-        self.preferences = self.load_preferences()
+        self.presence_preferences = self.load_presence_preferences()
+        self.language = tk.StringVar(value=get_settings().get('language'))
 
         # Initialize image options
-        self.large_image_option = tk.StringVar(value=self.preferences.get('large_image_option', '1'))
-        self.large_custom_image_url = tk.StringVar(value=self.preferences.get('large_custom_image_url', ''))
-        self.small_image_option = tk.StringVar(value=self.preferences.get('small_image_option', '2'))
-        self.small_custom_image_url = tk.StringVar(value=self.preferences.get('small_custom_image_url', ''))
+        self.large_image_option = tk.StringVar(value=self.presence_preferences.get('large_image_option', '1'))
+        self.large_custom_image_url = tk.StringVar(value=self.presence_preferences.get('large_custom_image_url', ''))
+        self.small_image_option = tk.StringVar(value=self.presence_preferences.get('small_image_option', '2'))
+        self.small_custom_image_url = tk.StringVar(value=self.presence_preferences.get('small_custom_image_url', ''))
 
         # Create tab contents
         self.create_home_tab()
-        self.create_preferences_tab()
+        self.create_presence_tab()
+        self.create_settings_tab()
 
         # Update preferences tab
-        self.update_preferences_tab()
+        self.update_presence_tab()
 
         # Set window icon
         self.set_window_icon('images/madotsuki.ico')
@@ -60,16 +62,19 @@ class Application(tk.Tk):
         self.style.configure('Custom.TFrame', background=DEFAULT_BG)
         self.style.configure('Custom.TLabel', background=DEFAULT_BG, font=('Helvetica', 10), foreground=TEXT_COLOR)
         self.style.configure('Custom.TButton', background=BUTTON_BG, foreground=BUTTON_FG)
+        self.style.configure('Custom.TMenu', background=DEFAULT_BG, foreground=TEXT_COLOR)
 
         # Initialize notebook and tabs
         self.notebook = ttk.Notebook(self, style='Custom.TNotebook')
         self.notebook.pack(fill='both', expand=True)
 
         self.home_tab = ttk.Frame(self.notebook, style='Custom.TFrame')
-        self.preferences_tab = ttk.Frame(self.notebook, style='Custom.TFrame')
+        self.presence_tab = ttk.Frame(self.notebook, style='Custom.TFrame')
+        self.settings_tab = ttk.Frame(self.notebook, style='Custom.TFrame')
 
-        self.notebook.add(self.home_tab, text='Home')
-        self.notebook.add(self.preferences_tab, text='Preferences')
+        self.notebook.add(self.home_tab, text=get_translated_string('tkui_tab_home'))
+        self.notebook.add(self.presence_tab, text=get_translated_string('tkui_tab_presence'))
+        self.notebook.add(self.settings_tab, text=get_translated_string('tkui_tab_settings'))
 
     def set_window_icon(self, icon_path):
         self.iconbitmap(icon_path)
@@ -79,45 +84,54 @@ class Application(tk.Tk):
             get_app_name(),
             Image.open(icon_path),
             get_app_name(),
-            pystray.Menu(pystray.MenuItem('Show', self.restore_window))
+            pystray.Menu(pystray.MenuItem(get_translated_string('tkui_tray_option_show'), self.restore_window))
         )
         self.tray.run_detached()
 
     def create_home_tab(self):
         self.create_label(self.home_tab, f'Yume 2kki Rich Presence ({get_app_name()})', 16, 10)
-        self.create_label(self.home_tab, f'App version: {self.version}', 10, 10)
-        self.create_button(self.home_tab, 'Minimize to Tray', self.minimize_to_tray, 20, 5)
-        self.create_button(self.home_tab, 'Stop', self.terminate, 20, 5)
+        self.create_label(self.home_tab, get_translated_string('tkui_home_app_version') + " " + str(self.version), 10, 10)
+        self.create_button(self.home_tab, get_translated_string('tkui_home_minimize_to_tray'), self.minimize_to_tray, 20, 5)
+        self.create_button(self.home_tab, get_translated_string('tkui_home_stop'), self.terminate, 20, 5)
 
-    def create_preferences_tab(self):
-        self.create_label(self.preferences_tab, 'Presence preferences', 16, 10, row=0, column=0, columnspan=2)
+    def create_presence_tab(self):
+        self.create_label(self.presence_tab, get_translated_string('tkui_presence_title'), 16, 10, row=0, column=0, columnspan=2)
 
         settings_labels = {
-            'details_text': 'Presence Details',
-            'state_text': 'Presence State',
-            'large_image_text': 'Large Image Text',
-            'small_image_text': 'Small Image Text'
+            'details_text': get_translated_string('tkui_presence_label_details'),
+            'state_text': get_translated_string('tkui_presence_label_state'),
+            'large_image_text': get_translated_string('tkui_presence_label_large_image'),
+            'small_image_text': get_translated_string('tkui_presence_label_small_image')
         }
 
         tooltips = {
-            'details_text': 'The first message that displays below the presence title (YNOProject Online).',
-            'state_text': 'The second message that displays below details.',
-            'large_image_text': 'The text that displays when hovering the large image.',
-            'small_image_text': 'The text that displays when hovering the small image.'
+            'details_text': get_translated_string('tkui_presence_details_tooltip'),
+            'state_text': get_translated_string('tkui_presence_state_tooltip'),
+            'large_image_text': get_translated_string('tkui_presence_large_image_tooltip'),
+            'small_image_text': get_translated_string('tkui_presence_small_image_tooltip')
         }
 
         self.settings_entries = {}
         for i, (setting, label_text) in enumerate(settings_labels.items()):
-            self.create_label(self.preferences_tab, label_text, 10, 5, row=i+1, column=0)
-            entry = self.create_entry(self.preferences_tab, 30, row=i+1, column=1)
+            self.create_label(self.presence_tab, label_text, 10, 5, row=i+1, column=0)
+            entry = self.create_entry(self.presence_tab, 30, row=i+1, column=1)
             self.create_tooltip(entry, tooltips[setting])
             self.settings_entries[setting] = entry
 
-        self.create_image_option(self.preferences_tab, 'Large Image', self.large_image_option, self.large_custom_image_url, len(settings_labels)+1)
-        self.create_image_option(self.preferences_tab, 'Small Image', self.small_image_option, self.small_custom_image_url, len(settings_labels)+4)
+        self.create_image_option(self.presence_tab, get_translated_string('tkui_presence_image_option_large'), self.large_image_option, self.large_custom_image_url, len(settings_labels)+1)
+        self.create_image_option(self.presence_tab, get_translated_string('tkui_presence_image_option_small'), self.small_image_option, self.small_custom_image_url, len(settings_labels)+4)
 
-        self.create_button(self.preferences_tab, 'Save', self.save_preferences, 20, 10, row=len(settings_labels)+7, column=0, columnspan=2)
+        self.create_button(self.presence_tab, get_translated_string('tkui_presence_save'), self.save_preferences, 20, 10, row=len(settings_labels)+7, column=0, columnspan=2)
 
+    def create_settings_tab(self):
+        self.create_label(self.settings_tab, get_translated_string('tkui_settings_title'), 16, 10, row=0, column=0, columnspan=2)
+        
+        languages = {"en": "English", "pt_br": "Português"}
+        
+        self.create_label(self.settings_tab, get_translated_string('tkui_settings_select_language'), 10, 5, row=1, column=0)
+        self.create_menu(self.settings_tab, self.language, languages, 10, column=0)
+        self.language.trace_add('write', self.save_settings)
+    
     def create_label(self, parent, text, font_size, pady, **grid_opts):
         label = tk.Label(parent, text=text, font=('Helvetica', font_size), bg=DEFAULT_BG, fg=TEXT_COLOR)
         label.grid(pady=pady, **grid_opts)
@@ -132,15 +146,21 @@ class Application(tk.Tk):
         button = tk.Button(parent, text=text, command=command, bg=BUTTON_BG, fg=BUTTON_FG, width=width)
         button.grid(pady=pady, **grid_opts)
         return button
+    
+    def create_menu(self, parent, variable, values, pady, **grid_opts):
+        menu = tk.OptionMenu(parent, variable, *values)
+        menu.configure(bg=ENTRY_BG, fg=TEXT_COLOR, font=("Arial", 12), activebackground=TOOLTIP_BG, activeforeground=BUTTON_FG)
+        menu.grid(pady=pady, **grid_opts)
+        return menu
 
     def create_image_option(self, parent, label_text, image_option_var, custom_image_url_var, start_row):
         self.create_label(parent, label_text, 12, 5, row=start_row, column=0, columnspan=2)
         frame = tk.Frame(parent, bg=DEFAULT_BG)
         frame.grid(row=start_row+1, column=0, columnspan=2, pady=5)
 
-        tk.Radiobutton(frame, text='Use current room image', variable=image_option_var, value='1', bg=DEFAULT_BG).pack(anchor='w')
-        tk.Radiobutton(frame, text='Use badge image', variable=image_option_var, value='2', bg=DEFAULT_BG).pack(anchor='w')
-        custom_image_rb = tk.Radiobutton(frame, text='Use custom image', variable=image_option_var, value='3', bg=DEFAULT_BG)
+        tk.Radiobutton(frame, text=get_translated_string('tkui_presence_radio_option_current_room'), variable=image_option_var, value='1', bg=DEFAULT_BG).pack(anchor='w')
+        tk.Radiobutton(frame, text=get_translated_string('tkui_presence_radio_option_badge'), variable=image_option_var, value='2', bg=DEFAULT_BG).pack(anchor='w')
+        custom_image_rb = tk.Radiobutton(frame, text=get_translated_string('tkui_presence_radio_option_custom'), variable=image_option_var, value='3', bg=DEFAULT_BG)
         custom_image_rb.pack(anchor='w')
 
         custom_image_entry = tk.Entry(parent, textvariable=custom_image_url_var, width=30, bg=ENTRY_BG, fg=TEXT_COLOR)
@@ -156,7 +176,7 @@ class Application(tk.Tk):
         image_option_var.trace('w', on_image_option_change)
 
     def create_tooltip(self, widget, text):
-        """Generates a small tooltip when user hovers the mouse above the label."""
+        """Generates a small tooltip when user hovers the mouse above the determined widget."""
         tooltip = tk.Toplevel(widget)
         tooltip.wm_overrideredirect(True)
         tooltip.wm_geometry("300x40")
@@ -189,50 +209,57 @@ class Application(tk.Tk):
         widget.bind("<Enter>", enter)
         widget.bind("<Leave>", leave)
 
-    def load_preferences(self):
-        """Loads preference values from the preferences file."""
+    def load_presence_preferences(self):
+        """Loads presence preference values from the presence file."""
         try:
-            with open('preferences.json', 'r') as f:
+            with open('presence.json', 'r') as f:
                 return json.load(f)
         except FileNotFoundError:
             return {}
 
-    def update_preferences_tab(self):
-        """Preloads the entries in settings tab with the preferences value."""
+    def update_presence_tab(self):
+        """Preloads the entries in settings tab with the presence preferences value."""
         for setting, entry in self.settings_entries.items():
             entry.delete(0, 'end')
-            entry.insert(0, self.preferences.get(setting, ''))
-        self.large_image_option.set(self.preferences.get('large_image_option', '1'))
-        self.large_custom_image_url.set(self.preferences.get('large_custom_image_url', ''))
-        self.small_image_option.set(self.preferences.get('small_image_option', '2'))
-        self.small_custom_image_url.set(self.preferences.get('small_custom_image_url', ''))
+            entry.insert(0, self.presence_preferences.get(setting, ''))
+        self.large_image_option.set(self.presence_preferences.get('large_image_option', '1'))
+        self.large_custom_image_url.set(self.presence_preferences.get('large_custom_image_url', ''))
+        self.small_image_option.set(self.presence_preferences.get('small_image_option', '2'))
+        self.small_custom_image_url.set(self.presence_preferences.get('small_custom_image_url', ''))
 
     def save_preferences(self):
-        """Saves entries from settings tab into the preferences file."""
+        """Saves entries from settings tab into the presence preferences file."""
         for setting, entry in self.settings_entries.items():
-            self.preferences[setting] = entry.get()
-        self.preferences['large_image_option'] = self.large_image_option.get()
-        self.preferences['large_custom_image_url'] = self.large_custom_image_url.get()
-        self.preferences['small_image_option'] = self.small_image_option.get()
-        self.preferences['small_custom_image_url'] = self.small_custom_image_url.get()
+            self.presence_preferences[setting] = entry.get()
+        self.presence_preferences['large_image_option'] = self.large_image_option.get()
+        self.presence_preferences['large_custom_image_url'] = self.large_custom_image_url.get()
+        self.presence_preferences['small_image_option'] = self.small_image_option.get()
+        self.presence_preferences['small_custom_image_url'] = self.small_custom_image_url.get()
         
         # Validate URLs and set to default if invalid
-        if not validate_url(self.preferences['large_custom_image_url']):
-            self.preferences['large_custom_image_url'] = PLACEHOLDER_IMAGE
+        if not validate_url(self.presence_preferences['large_custom_image_url']):
+            self.presence_preferences['large_custom_image_url'] = PLACEHOLDER_IMAGE
         
-        if not validate_url(self.preferences['small_custom_image_url']):
-            self.preferences['small_custom_image_url'] = PLACEHOLDER_IMAGE
+        if not validate_url(self.presence_preferences['small_custom_image_url']):
+            self.presence_preferences['small_custom_image_url'] = PLACEHOLDER_IMAGE
         
-        self.save_to_file()
+        self.save_preferences_to_file()
 
-    def save_to_file(self):
-        """Saves preferences to 'preferences.json' file."""
+    def save_preferences_to_file(self):
+        """Saves presence preferences to 'presence.json' file."""
         try:
-            with open('preferences.json', 'w') as f:
-                json.dump(self.preferences, f, indent=4)
-            self.show_notification('Preferences have been saved!')
+            with open('presence.json', 'w') as f:
+                json.dump(self.presence_preferences, f, indent=4)
+            self.show_notification(get_translated_string('tkui_notif_preferences_saved'))
         except Exception as e:
-            self.show_notification(f'Could not save preferences: {e}')
+            self.show_notification(get_translated_string('tkui_notif_preferences_saved_exception'))
+            print(e)
+    
+    def save_settings(self, *args):
+        settings = {"language": self.language.get()}
+        with open('settings.json', 'w') as file:
+            json.dump(settings, file, indent=4)
+        self.show_notification(get_translated_string('tkui_notif_settings_saved'))
 
     def show_notification(self, message):
         """Displays a non-intrusive notification."""

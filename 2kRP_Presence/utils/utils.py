@@ -11,7 +11,7 @@ def load_json(file_path: str):
     Loads JSON data from a file.
     """
     try:
-        with open(file_path, 'r') as file:
+        with open(file_path, 'r', encoding='utf-8') as file:
             return json.load(file)
     except Exception as e:
         print(f"Error loading JSON file: {e}")
@@ -42,16 +42,18 @@ def validate_url(url):
             r'(?:/?|[/?]\S+)$', re.IGNORECASE)
         return re.match(regex, url) is not None
 
-def get_preference(key: str, replacements: dict = None):
+def get_presence_preference(key: str, replacements: dict = None):
     """
-    Returns a preference value from the preferences file (preferences.json)
-    Example: get_preference('dream_world')
-    Returns: "Dreaming"
+    Returns a preference value from the presence file (presence.json)
+    
+    Example: get_presence_preference('details_text')
+    
+    Returns: "Playing $gametype"
     """
     if replacements is None:
         replacements = {}
 
-    config = load_json('preferences.json')
+    config = load_json('presence.json')
     value = config.get(key)
 
     if isinstance(value, str):
@@ -62,6 +64,23 @@ def get_preference(key: str, replacements: dict = None):
         value = replace_patterns(value, replacements)
 
     return value
+
+def get_settings():
+    """
+    Returns the stored settings from the settings file (settings.json).
+    """
+    return load_json('settings.json')
+
+def load_translation(language_code):
+    return load_json(f"langs/{language_code}.json")
+
+def get_translated_string(key: str):
+    """
+    Returns a translated string according to the current language code defined in the settings file.
+    """
+    language = get_settings().get('language')
+    translations = load_translation(language)
+    return translations.get(key, f"'{key}' not found in '{language}'")
 
 def get_image_link(soup, selector):
     img_link = soup.select_one(selector)
@@ -74,6 +93,7 @@ def get_image_link(soup, selector):
 def get_wiki_image(wiki_url: str):
     """
     Tries to get the current room image from yume.wiki website.
+    
     Returns: the image source (direct link) or `None`
     """
     if not wiki_url:
