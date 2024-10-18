@@ -9,7 +9,7 @@ It utilizes a browser extension to act as a "linker", whose primary function is 
 Most of the data the extension gathers is captured from HTML elements of the site itself.
 
 <div align="center">
-    <img src="https://github.com/Nearius-River/2kRP_Project/assets/49107257/d3bdd888-5fb3-43d9-9bba-56c5f0c266f7" alt="Example of how presence looks.">
+    <img src="https://github.com/Nearius-River/2kRP_Project/assets/49107257/d3bdd888-5fb3-43d9-9bba-56c5f0c266f7" alt="Example of how the presence looks.">
 </div>
 
 ## Project Structure
@@ -57,9 +57,13 @@ Most of the data the extension gathers is captured from HTML elements of the sit
     - Visit the YNO site and pick any Yume game.
     - Bam! Your presence will be updated as long as the app is running. Truly magical.
 
+### Switching Application Language
+
+Currently, the application is fully compatible with English and Portuguese (Brazilian). You can change your preferred language through the menu in the settings tab.
+
 ### Customizing Presence Text
 
-You can customize most of the presence text using `preferences.json`. Open this file with any text editor (e.g., Notepad, Notepad++, etc.) or through the application interface and modify it as desired.
+You can customize most of the presence text using `preferences.json`. Open this file with any text editor (e.g., Notepad, Notepad++, etc.) and modify as desired, although it is recommended to use the built-in application interface.
 
 #### Available Patterns
 
@@ -75,11 +79,10 @@ These patterns can be used to dynamically update the presence text. They get upd
 
 Due to pypresence error handling, if you need to leave an entry empty (for example, the presence state message), insert at least three whitespace characters, like this: `"   "` (notice the blank spaces). Leaving entries fully empty will result in a warning, and your presence won't be updated.
 
-## Known problems
+## KnownProblems
 
-The installation process may be too complex for less technologically inclined users, requiring multiple steps/configurations.
-
-Proposed Solution: Convert the app into a single executable (.exe) file while retaining functionality OR implement more user-friendly installation methods.
+1. The installation process may be too complex for less technologically inclined users, requiring multiple steps/configurations;
+2. The application interface is not interesting enough and lacks visual effort.
 
 ## Contributions
 
