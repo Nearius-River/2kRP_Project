@@ -2,6 +2,7 @@
     "greeting": "NOTE: Closing this window will instantly terminate the server connection and undo your current presence on Discord!\nThis window will only notify of warnings and errors, if any occurs.\nHave fun travels!",
     "flask_server_start": "Flask server established!",
     "flask_server_end": "Flask server has ended.",
+	"presence_player_entity": "Player",
     "presence_loading_game": "Loading game...",
     "presence_picking_game": "Picking a game...",
     "presence_no_location": "Unknown Location",
@@ -32,7 +33,7 @@
     "tkui_presence_image_option_small": "Small Image",
     "tkui_presence_save": "Save",
     "tkui_settings_title": "Application settings",
-    "tkui_settings_select_language": "Select language:",
+    "tkui_settings_select_language": "Application language:",
     "tkui_notif_preferences_saved": "Preferences have been saved!",
     "tkui_notif_preferences_saved_exception": "Could not save preferences! The error will be shown in the console.",
     "tkui_notif_settings_saved": "The configurations have been saved. Restart the application to apply the changes."

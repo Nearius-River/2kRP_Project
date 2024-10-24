@@ -2,6 +2,7 @@
     "greeting": "NOTA: Fechar esta janela encerrará a conexão com o servidor e desfazerá sua atividade atual no Discord!\nEsta janela somente notificará de avisos e erros, caso venham a ocorrer.\nTenha viagens divertidas!",
     "flask_server_start": "Servidor Flask estabelecido!",
     "flask_server_end": "Servidor Flask encerrado.",
+	"presence_player_entity": "Jogador",
     "presence_loading_game": "Carregando jogo...",
     "presence_picking_game": "Escolhendo um jogo...",
     "presence_no_location": "Localização desconhecida",
@@ -32,7 +33,7 @@
     "tkui_presence_image_option_small": "Imagem Menor",
     "tkui_presence_save": "Salvar",
     "tkui_settings_title": "Configurações da aplicação",
-    "tkui_settings_select_language": "Selecionar língua:",
+    "tkui_settings_select_language": "Idioma da aplicação:",
     "tkui_notif_preferences_saved": "Preferências salvas!",
     "tkui_notif_preferences_saved_exception": "Não foi possível salvar as preferências! O erro será exibido no console.",
     "tkui_notif_settings_saved": "As configurações foram salvas. Reinicie o programa para aplicar as mudanças."
