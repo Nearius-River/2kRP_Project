@@ -11,7 +11,7 @@ DEFAULT_BG = '#ffcccc'
 ENTRY_BG = '#ffb8b8'
 TEXT_COLOR = '#333333'
 BUTTON_BG = '#ff9999'
-BUTTON_FG = '#ffffff'
+BUTTON_FG = '#000000'
 TOOLTIP_BG = '#f99292'
 
 PLACEHOLDER_IMAGE = 'https://i.imgur.com/TN8WK7E.png'
@@ -54,6 +54,8 @@ class Application(tk.Tk):
         self.title(get_app_name())
         self.version = get_app_version()
         self.geometry('350x600')
+        self.maxsize(350, 600)
+        self.minsize(350, 600)
         self.configure(background=TOOLTIP_BG)
 
         # Configure styles
@@ -89,10 +91,10 @@ class Application(tk.Tk):
         self.tray.run_detached()
 
     def create_home_tab(self):
-        self.create_label(self.home_tab, f'Yume 2kki Rich Presence ({get_app_name()})', 16, 10)
-        self.create_label(self.home_tab, get_translated_string('tkui_home_app_version') + " " + str(self.version), 10, 10)
-        self.create_button(self.home_tab, get_translated_string('tkui_home_minimize_to_tray'), self.minimize_to_tray, 20, 5)
-        self.create_button(self.home_tab, get_translated_string('tkui_home_stop'), self.terminate, 20, 5)
+        self.create_label(self.home_tab, f'Yume 2kki Rich Presence ({get_app_name()})', 16, 10, row=0, column=0)
+        self.create_label(self.home_tab, get_translated_string('tkui_home_app_version') + " " + str(self.version), 10, 10, row=1, column=0)
+        self.create_button(self.home_tab, get_translated_string('tkui_home_minimize_to_tray'), self.minimize_to_tray, 30, 10, row=2, column=0)
+        self.create_button(self.home_tab, get_translated_string('tkui_home_stop'), self.terminate, 30, 10, row=3, column=0)
 
     def create_presence_tab(self):
         self.create_label(self.presence_tab, get_translated_string('tkui_presence_title'), 16, 10, row=0, column=0, columnspan=2)
@@ -128,8 +130,8 @@ class Application(tk.Tk):
         
         languages = {"en": "English", "pt_br": "Português"}
         
-        self.create_label(self.settings_tab, get_translated_string('tkui_settings_select_language'), 10, 5, row=1, column=0)
-        self.create_menu(self.settings_tab, self.language, languages, 10, column=0)
+        self.create_label(self.settings_tab, get_translated_string('tkui_settings_select_language'), 12, 10, row=1, column=0)
+        self.create_menu(self.settings_tab, self.language, languages, 10, row=1, column=1)
         self.language.trace_add('write', self.save_settings)
     
     def create_label(self, parent, text, font_size, pady, **grid_opts):
@@ -158,17 +160,17 @@ class Application(tk.Tk):
         frame = tk.Frame(parent, bg=DEFAULT_BG)
         frame.grid(row=start_row+1, column=0, columnspan=2, pady=5)
 
-        tk.Radiobutton(frame, text=get_translated_string('tkui_presence_radio_option_current_room'), variable=image_option_var, value='1', bg=DEFAULT_BG).pack(anchor='w')
-        tk.Radiobutton(frame, text=get_translated_string('tkui_presence_radio_option_badge'), variable=image_option_var, value='2', bg=DEFAULT_BG).pack(anchor='w')
-        custom_image_rb = tk.Radiobutton(frame, text=get_translated_string('tkui_presence_radio_option_custom'), variable=image_option_var, value='3', bg=DEFAULT_BG)
+        tk.Radiobutton(frame, text=get_translated_string('tkui_presence_radio_option_current_room'), variable=image_option_var, value='current_room', bg=DEFAULT_BG).pack(anchor='w')
+        tk.Radiobutton(frame, text=get_translated_string('tkui_presence_radio_option_badge'), variable=image_option_var, value='badge', bg=DEFAULT_BG).pack(anchor='w')
+        custom_image_rb = tk.Radiobutton(frame, text=get_translated_string('tkui_presence_radio_option_custom'), variable=image_option_var, value='custom', bg=DEFAULT_BG)
         custom_image_rb.pack(anchor='w')
 
         custom_image_entry = tk.Entry(parent, textvariable=custom_image_url_var, width=30, bg=ENTRY_BG, fg=TEXT_COLOR)
-        if image_option_var.get() == '3':
+        if image_option_var.get() == 'custom':
             custom_image_entry.grid(row=start_row+2, column=0, columnspan=2, pady=5)
         
         def on_image_option_change(*args):
-            if image_option_var.get() == '3':
+            if image_option_var.get() == 'custom':
                 custom_image_entry.grid(row=start_row+2, column=0, columnspan=2, pady=5)
             else:
                 custom_image_entry.grid_forget()
