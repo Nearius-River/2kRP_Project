@@ -1,7 +1,7 @@
 import time
 from pypresence import Presence
 from shared.data import get_data
-from utils.utils import get_presence_preference, get_wiki_image, get_translated_string
+from utils.utils import get_presence_preference, get_wiki_image, get_settings, get_translated_string
 from color.colors import print_green, print_yellow
 
 CLIENT_ID = '1246902701535793324'
@@ -34,29 +34,44 @@ game_type_mappings = {
     'yume': 'Yume Nikki'
 }
 
-def get_plural_suffix(count):
-    return '' if count == 1 else 's'
+def get_image_url(image_option: str, wiki_page_url: str, badge_image_url: str, custom_image_url: str) -> str:
+    """Returns the image URL based on the specified option."""
+    if image_option == 'current_room':
+        wiki_image = get_wiki_image(wiki_page_url)
+        return wiki_image if wiki_image else PLACEHOLDER_IMAGE
+    elif image_option == 'badge':
+        return badge_image_url or PLACEHOLDER_IMAGE
+    else:
+        return custom_image_url
 
-def format_player_count(player_count, entity='Player'):
+def get_plural_suffix(count):
+    language_code = get_settings().get('language')
+    
+    plural_suffixes = {
+        'en': 's',
+        'pt_br': 'es'
+    }
+    
+    suffix = plural_suffixes.get(language_code, 's')
+    
+    return '' if count == 1 else suffix
+
+def format_player_count(player_count):
+    entity = get_translated_string('presence_player_entity')
     suffix = get_plural_suffix(player_count)
     return f"{player_count} {entity}{suffix}"
 
 def fetch_presence_data():
-    """
-    Fetches the current presence data from the game.
-    
-    Returns:
-        dict: A dictionary with the presence data.
-    """
-    data = get_data()
+    """Fetches the current presence data from the game."""
+    game_data = get_data()
     try:
-        game_type = data['game_type']
-        location = data['location']
-        badge_image_url = data['badge_image_url']
-        players_online = data['players_online']
-        players_on_map = data['players_on_map']
-        wiki_page_url = data['wiki_page_url']
-    except KeyError:
+        game_type = game_data['game_type']
+        location = game_data['location']
+        badge_image_url = game_data['badge_image_url']
+        players_online = game_data['players_online']
+        players_on_map = game_data['players_on_map']
+        wiki_page_url = game_data['wiki_page_url']
+    except (KeyError, TypeError):
         return {'state': get_translated_string('presence_loading_game')}
     
     if game_type is None:
@@ -75,27 +90,12 @@ def fetch_presence_data():
     details_message = get_presence_preference('details_text', default_replacements)
     state_message = get_presence_preference('state_text', default_replacements)
     large_image_text = get_presence_preference('large_image_text', default_replacements)
-    small_image_url = badge_image_url
     
-    # Configure large image url
     large_image_option = get_presence_preference('large_image_option')
-    if large_image_option == '1': # Use current room image
-        wiki_image = get_wiki_image(wiki_page_url)
-        large_image_url = wiki_image if wiki_image else PLACEHOLDER_IMAGE
-    elif large_image_option == '2': # Use badge image
-        large_image_url = badge_image_url or PLACEHOLDER_IMAGE
-    else: # Custom image
-        large_image_url = get_presence_preference('large_custom_image_url')
-        
-    # Configure small image url
+    large_image_url = get_image_url(large_image_option, wiki_page_url, badge_image_url, get_presence_preference('large_custom_image_url'))
+    
     small_image_option = get_presence_preference('small_image_option')
-    if small_image_option == '1': # Use current room image
-        wiki_image = get_wiki_image(wiki_page_url)
-        small_image_url = wiki_image if wiki_image else PLACEHOLDER_IMAGE
-    elif small_image_option == '2': # Use badge image
-        small_image_url = badge_image_url or PLACEHOLDER_IMAGE
-    else: # Custom image
-        small_image_url = get_presence_preference('small_custom_image_url')
+    small_image_url = get_image_url(small_image_option, wiki_page_url, badge_image_url, get_presence_preference('small_custom_image_url'))
     
     return {
         'details': details_message,
