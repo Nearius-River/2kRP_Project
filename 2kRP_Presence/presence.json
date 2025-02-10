@@ -3,8 +3,8 @@
     "state_text": "In: $location",
     "large_image_text": "$playersonline Online | $playersonmap on Current Map",
     "small_image_text": "2kRP v$version",
-    "large_image_option": "1",
+    "large_image_option": "current_room",
     "large_custom_image_url": "https://i.imgur.com/TN8WK7E.png",
-    "small_image_option": "2",
+    "small_image_option": "badge",
     "small_custom_image_url": "https://i.imgur.com/TN8WK7E.png"
 }
