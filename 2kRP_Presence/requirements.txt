@@ -3,3 +3,4 @@ pypresence
 pillow
 pystray
 requests
+beautifulsoup4
