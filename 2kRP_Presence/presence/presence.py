@@ -5,7 +5,7 @@ from utils.utils import get_presence_preference, get_wiki_image, get_settings, g
 from color.colors import print_green, print_yellow
 
 CLIENT_ID = '1246902701535793324'
-START_TIME = time.time()
+start_time = time.time()
 
 # Defaults
 PLACEHOLDER_IMAGE = 'https://i.imgur.com/TN8WK7E.png'
@@ -28,6 +28,7 @@ game_type_mappings = {
     'sheawaits': 'She Awaits',
     'someday': 'Someday',
     'tsushin': 'Yume Tsushin',
+    'unaccomplished': 'Unaccomplished',
     'unconscious': 'Collective Unconscious',
     'ultraviolet': 'Ultra Violet',
     'unevendream': 'Uneven Dream',
@@ -54,7 +55,7 @@ def get_plural_suffix(count):
     
     suffix = plural_suffixes.get(language_code, 's')
     
-    return '' if count == 1 else suffix
+    return '' if count <= 1 else suffix
 
 def format_player_count(player_count):
     entity = get_translated_string('presence_player_entity')
@@ -75,6 +76,8 @@ def fetch_presence_data():
         return {'state': get_translated_string('presence_loading_game')}
     
     if game_type is None:
+        global start_time
+        start_time = time.time()
         return {'state': get_translated_string('presence_picking_game'), 'large_image': HUB_IMAGE}
     
     game_type_full = game_type_mappings.get(game_type, game_type)
@@ -104,7 +107,7 @@ def fetch_presence_data():
         'large_text': large_image_text,
         'small_image': small_image_url,
         'small_text': get_presence_preference('small_image_text', default_replacements),
-        'start': START_TIME
+        'start': start_time
     }
 
 def run_presence(stop_flag):
