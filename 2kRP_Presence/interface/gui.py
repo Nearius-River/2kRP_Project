@@ -1,4 +1,5 @@
 import json
+import time
 import tkinter as tk
 from tkinter import ttk
 import pystray
@@ -21,6 +22,7 @@ class Application(tk.Tk):
     def __init__(self, stop_flag):
         super().__init__()
         self.init_ui()
+        self.start_time = time.time()
         self.stop_flag = stop_flag
 
         # Load preferences
@@ -95,6 +97,9 @@ class Application(tk.Tk):
         self.create_label(self.home_tab, get_translated_string('tkui_home_app_version') + " " + str(self.version), 10, 10, row=1, column=0)
         self.create_button(self.home_tab, get_translated_string('tkui_home_minimize_to_tray'), self.minimize_to_tray, 30, 10, row=2, column=0)
         self.create_button(self.home_tab, get_translated_string('tkui_home_stop'), self.terminate, 30, 10, row=3, column=0)
+
+        self.timer_label = self.create_label(self.home_tab, get_translated_string('tkui_home_timer') + " 00:00:00", 12, 10, row=4, column=0)
+        self.update_timer()
 
     def create_presence_tab(self):
         self.create_label(self.presence_tab, get_translated_string('tkui_presence_title'), 16, 10, row=0, column=0, columnspan=2)
@@ -274,6 +279,17 @@ class Application(tk.Tk):
         )
         notification.pack(pady=5)
         self.after(3000, notification.destroy)
+    
+    def update_timer(self):
+        elapsed_time = int(time.time() - self.start_time)
+        hours = elapsed_time // 3600
+        minutes = (elapsed_time % 3600) // 60
+        seconds = elapsed_time % 60
+
+        formatted_time = f"{get_translated_string('tkui_home_timer')} {hours:02}:{minutes:02}:{seconds:02}"
+        self.timer_label.config(text=formatted_time)
+
+        self.timer_label.after(1000, self.update_timer)    
 
     def minimize_to_tray(self):
         """Minimizes the window to the system tray."""

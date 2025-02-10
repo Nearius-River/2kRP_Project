@@ -17,6 +17,7 @@
     "tkui_home_app_version": "App version:",
     "tkui_home_minimize_to_tray": "Minimize to Tray",
     "tkui_home_stop": "Stop",
+    "tkui_home_timer": "Activity time:",
     "tkui_presence_title": "Presence settings",
     "tkui_presence_label_details": "Presence Details",
     "tkui_presence_label_state": "Presence State",
