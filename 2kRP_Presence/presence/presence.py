@@ -17,6 +17,7 @@ game_type_mappings = {
     'braingirl': 'Braingirl',
     'deepdreams': 'Deep Dreams',
     'flow': '.flow',
+    'fog': 'Fog',
     'genie': 'Dream Genie',
     'if': 'If',
     'mikan': 'Mikan Muzou',
