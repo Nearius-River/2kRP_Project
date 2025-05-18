@@ -1,15 +1,16 @@
 import json
 import re
 import requests
-from utils.constants import get_app_version
 from bs4 import BeautifulSoup
+from utils.constants import (
+    BASE_WIKI_URL,
+    DEFAULT_LANGUAGE,
+)
 
-BASE_WIKI_URL = 'https://yume.wiki'
+_translation_cache = {}
 
 def load_json(file_path: str):
-    """
-    Loads JSON data from a file.
-    """
+    """Loads a JSON file and returns its content as a dictionary."""
     try:
         with open(file_path, 'r', encoding='utf-8') as file:
             return json.load(file)
@@ -17,72 +18,62 @@ def load_json(file_path: str):
         print(f"Error loading JSON file: {e}")
         return {}
 
-def replace_patterns(value: str, replacements: dict):
+def replace_patterns(text: str, replacements: dict) -> str:
     """
-    Replaces the patterns in the $pattern format for the corresponding value in replacements.
+    Replaces all patterns in the '{pattern}' format by the specified values in the replacements dict.
+    
+    The patterns are defined as '{key}' and the replacements dict should contain the key-value pairs.
+    
+    Args:
+        text (str): The original string containing the patterns.
+        replacements (dict): A dictionary where keys are the patterns to be replaced and values are the replacements.
+
+    Returns:
+        str: The string with all patterns replaced.
     """
     def replacer(match):
         key = match.group(1)
-        return replacements.get(key, match.group(0))
+        return str(replacements.get(key, match.group(0)))
 
-    pattern = re.compile(r'\$(\w+)')
-    return pattern.sub(replacer, value)
+    return re.sub(r'\{([^}]+)\}', replacer, text)
 
-def validate_url(url):
-        """
-        Validates if the provided URL is valid.
-        """
-        regex = re.compile(
-            r'^(?:http|ftp)s?://'  # http:// or https://
-            r'(?:(?:[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?\.)+(?:[A-Z]{2,6}\.?|[A-Z0-9-]{2,}\.?)|'  # domain...
-            r'localhost|'  # localhost...
-            r'\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}|'  # ...or ipv4
-            r'\[?[A-F0-9]*:[A-F0-9:]+\]?)'  # ...or ipv6
-            r'(?::\d+)?'  # optional port
-            r'(?:/?|[/?]\S+)$', re.IGNORECASE)
-        return re.match(regex, url) is not None
+def validate_url(url: str):
+    """Validates if the provided URL is valid."""
+    url_pattern = re.compile(
+        r'^(https?://)'
+        r'([a-zA-Z0-9.-]+\.[a-zA-Z]{2,})'
+        r'(/[^\s]*)?'
+        r'\.(png|jpg|jpeg|gif|bmp|webp|svg)$',
+        re.IGNORECASE
+    )
 
-def get_presence_preference(key: str, replacements: dict = None):
-    """
-    Returns a preference value from the presence file (presence.json)
-    
-    Example: get_presence_preference('details_text')
-    
-    Returns: "Playing $gametype"
-    """
-    if replacements is None:
-        replacements = {}
-
-    config = load_json('presence.json')
-    value = config.get(key)
-
-    if isinstance(value, str):
-        # Insert constant replacements that don't change
-        replacements.update({
-            'version': get_app_version()
-        })
-        value = replace_patterns(value, replacements)
-
-    return value
-
-def get_settings():
-    """
-    Returns the stored settings from the settings file (settings.json).
-    """
-    return load_json('settings.json')
+    return bool(url_pattern.match(url))
 
 def load_translation(language_code):
     return load_json(f"langs/{language_code}.json")
 
 def get_translated_string(key: str):
-    """
-    Returns a translated string according to the current language code defined in the settings file.
-    """
-    language = get_settings().get('language')
-    translations = load_translation(language)
-    return translations.get(key, f"'{key}' not found in '{language}'")
+    """Retrieves the translated string for the given key based on the current language setting."""
+    with open('language.txt', 'r', encoding='utf-8') as file:
+        language = file.read().strip()
+    
+    if language not in _translation_cache:
+        _translation_cache[language] = load_translation(language)
+    
+    translations = _translation_cache[language]
+    if key in translations:
+        return translations[key]
+    
+    if DEFAULT_LANGUAGE != language:
+        if DEFAULT_LANGUAGE not in _translation_cache:
+            _translation_cache[DEFAULT_LANGUAGE] = load_translation(DEFAULT_LANGUAGE)
+        default_translations = _translation_cache[DEFAULT_LANGUAGE]
+        return default_translations.get(key, f"'{key}' not found in '{DEFAULT_LANGUAGE}'")
+    
+    return f"'{key}' not found in '{language}'"
 
 def get_image_link(soup, selector):
+    """Extracts the image link from the soup object using the provided selector."""
     img_link = soup.select_one(selector)
     if img_link and img_link['href'].startswith('/File'):
         thumbborder = soup.select_one('img.thumbborder')
@@ -94,7 +85,8 @@ def get_wiki_image(wiki_url: str):
     """
     Tries to get the current room image from yume.wiki website.
     
-    Returns: the image source (direct link) or `None`
+    Returns:
+        str: The URL of the image if found, otherwise None.
     """
     if not wiki_url:
         return None

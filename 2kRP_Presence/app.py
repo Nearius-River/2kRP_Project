@@ -1,11 +1,13 @@
 import logging
 import threading
-from interface.gui import Application
-from color.colors import print_green
-from presence.presence import run_presence
+import sys
+from PySide6.QtWidgets import QApplication
+from interface.qtui import MainWindow
 from server.server import create_app
 from werkzeug.serving import make_server
+from presence.presence import run_presence
 from utils.utils import get_translated_string
+from app_context import set_main_window
 
 # Configure logging
 log = logging.getLogger('werkzeug')
@@ -23,22 +25,29 @@ class FlaskThread(threading.Thread):
         self.context.push()
 
     def run(self):
-        """Run the Flask server."""
-        print_green(get_translated_string('flask_server_start'))
+        print(get_translated_string('flask_start'))
         self.server.serve_forever()
 
     def shutdown(self):
-        """Shutdown the Flask server."""
-        print(get_translated_string('flask_server_end'))
+        print(get_translated_string('flask_end'))
         self.server.shutdown()
 
 def greet_user():
-    """Print initial user information."""
     print(get_translated_string('greeting'))
 
 if __name__ == '__main__':
+    # Initialize the Qt application.
+    app = QApplication(sys.argv)
+    window = MainWindow()
+    set_main_window(window)
+    if not window.settings.value('start_minimized', True, type=bool):
+        window.show()
+        window.activateWindow()
+    else:
+        window.close()
+        
     greet_user()
-
+        
     # Run the Flask app in a separate thread
     flask_thread = FlaskThread()
     flask_thread.start()
@@ -46,15 +55,13 @@ if __name__ == '__main__':
     # Run the presence update loop in a separate thread
     presence_thread = threading.Thread(target=run_presence, args=(stop_flag,))
     presence_thread.start()
-
-    # Create the GUI in a separate thread
-    gui_thread = threading.Thread(target=lambda: Application(stop_flag).start_app())
-    gui_thread.start()
     
-    # Wait for the GUI thread to finish
-    gui_thread.join()
+    exit_code = app.exec()
 
-    # Wait for all other threads to finish
+    # Wait for the Qt application to finish
+    stop_flag.set()
     flask_thread.shutdown()
     flask_thread.join()
     presence_thread.join()
+    
+    sys.exit(exit_code)

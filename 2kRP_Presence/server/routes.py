@@ -5,9 +5,7 @@ bp = Blueprint('main', __name__)
 
 @bp.route('/receive_from_2kki', methods=['POST'])
 def receive_data():
-    """
-    Receive data from linker extension and update the data store appropriately.
-    """
+    """Receive data from the 2kki client extension and update the datastore."""
     try:
         data = request.json
         if not data:
@@ -27,7 +25,4 @@ def receive_data():
 
 @bp.route('/status', methods=['GET'])
 def status_check():
-    """
-    Verify server status.
-    """
     return "Server is running", 200

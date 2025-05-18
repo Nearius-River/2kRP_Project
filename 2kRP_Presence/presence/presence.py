@@ -1,15 +1,14 @@
 import time
 from pypresence import Presence
 from shared.data import get_data
-from utils.utils import get_presence_preference, get_wiki_image, get_settings, get_translated_string
-from color.colors import print_green, print_yellow
+from utils.utils import replace_patterns, get_wiki_image, get_translated_string
+from app_context import get_main_window
 
 CLIENT_ID = '1246902701535793324'
-start_time = time.time()
-
-# Defaults
 PLACEHOLDER_IMAGE = 'https://i.imgur.com/TN8WK7E.png'
 HUB_IMAGE = 'https://static.wikia.nocookie.net/yumenikki/images/9/9c/The_Nexus.png/revision/latest?cb=20110725075611'
+start_time = time.time()
+main_window = None
 
 game_type_mappings = {
     '2kki': 'Yume 2kki',
@@ -38,16 +37,16 @@ game_type_mappings = {
 
 def get_image_url(image_option: str, wiki_page_url: str, badge_image_url: str, custom_image_url: str) -> str:
     """Returns the image URL based on the specified option."""
-    if image_option == 'current_room':
+    if image_option == 'use_current_room':
         wiki_image = get_wiki_image(wiki_page_url)
         return wiki_image if wiki_image else PLACEHOLDER_IMAGE
-    elif image_option == 'badge':
+    elif image_option == 'use_badge':
         return badge_image_url or PLACEHOLDER_IMAGE
     else:
         return custom_image_url
 
 def get_plural_suffix(count):
-    language_code = get_settings().get('language')
+    language_code = main_window.settings.value('language', 'en')
     
     plural_suffixes = {
         'en': 's',
@@ -64,8 +63,13 @@ def format_player_count(player_count):
     return f"{player_count} {entity}{suffix}"
 
 def fetch_presence_data():
-    """Fetches the current presence data from the game."""
+    """Fetches the game data and prepares the presence information."""
+    global main_window
+    global start_time
+    
     game_data = get_data()
+    main_window = get_main_window()
+    
     try:
         game_type = game_data['game_type']
         location = game_data['location']
@@ -77,7 +81,6 @@ def fetch_presence_data():
         return {'state': get_translated_string('presence_loading_game')}
     
     if game_type is None:
-        global start_time
         start_time = time.time()
         return {'state': get_translated_string('presence_picking_game'), 'large_image': HUB_IMAGE}
     
@@ -90,24 +93,21 @@ def fetch_presence_data():
         'gametype': game_type_full
     }
     
-    # Define presence text
-    details_message = get_presence_preference('details_text', default_replacements)
-    state_message = get_presence_preference('state_text', default_replacements)
-    large_image_text = get_presence_preference('large_image_text', default_replacements)
-    
-    large_image_option = get_presence_preference('large_image_option')
-    large_image_url = get_image_url(large_image_option, wiki_page_url, badge_image_url, get_presence_preference('large_custom_image_url'))
-    
-    small_image_option = get_presence_preference('small_image_option')
-    small_image_url = get_image_url(small_image_option, wiki_page_url, badge_image_url, get_presence_preference('small_custom_image_url'))
+    # Presence text and image configuration
+    details_text = replace_patterns(main_window.settings.value('presence/details', '', type=str), default_replacements)
+    state_text = replace_patterns(main_window.settings.value('presence/state', '', type=str), default_replacements)
+    large_image = get_image_url(main_window.settings.value('presence/large_image', '', type=str), wiki_page_url, badge_image_url, main_window.settings.value('large_custom_image_url', '', type=str))
+    large_image_text = replace_patterns(main_window.settings.value('presence/large_image_text', '', type=str), default_replacements)
+    small_image = get_image_url(main_window.settings.value('presence/small_image', '', type=str), wiki_page_url, badge_image_url, main_window.settings.value('small_custom_image_url', '', type=str))
+    small_image_text = replace_patterns(main_window.settings.value('presence/small_image_text', '', type=str), default_replacements)
     
     return {
-        'details': details_message,
-        'state': state_message,
-        'large_image': large_image_url,
+        'details': details_text,
+        'state': state_text,
+        'large_image': large_image,
         'large_text': large_image_text,
-        'small_image': small_image_url,
-        'small_text': get_presence_preference('small_image_text', default_replacements),
+        'small_image': small_image,
+        'small_text': small_image_text,
         'start': start_time
     }
 
@@ -121,9 +121,9 @@ def run_presence(stop_flag):
     presence = Presence(CLIENT_ID)
     try:
         presence.connect()
-        print_green(get_translated_string('client_connected'))
+        print(get_translated_string('client_connected'))
     except Exception as e:
-        print_yellow(get_translated_string('client_connected_exception'), e)
+        print(get_translated_string('client_connection_exception'))
         time.sleep(30)
         return
 
@@ -137,7 +137,8 @@ def run_presence(stop_flag):
                 previous_state = current_state
             time.sleep(15)
         except Exception as e:
-            print_yellow(get_translated_string('client_update_exception'), e)
+            print(get_translated_string('client_update_exception'))
+            print(e)
             time.sleep(15)
     
     print(get_translated_string('client_disconnect'))

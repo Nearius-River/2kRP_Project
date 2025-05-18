@@ -1,6 +1,6 @@
 flask
 pypresence
-pillow
-pystray
 requests
 beautifulsoup4
+pyside6
+qt-material
