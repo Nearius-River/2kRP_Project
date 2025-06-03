@@ -46,7 +46,9 @@ def get_image_url(image_option: str, wiki_page_url: str, badge_image_url: str, c
         return custom_image_url
 
 def get_plural_suffix(count):
-    language_code = main_window.settings.value('language', 'en')
+    """Returns the plural suffix based on the current language setting."""
+    with open('language.txt', 'r', encoding='utf-8') as f:
+        language_code = f.read().strip()
     
     plural_suffixes = {
         'en': 's',
